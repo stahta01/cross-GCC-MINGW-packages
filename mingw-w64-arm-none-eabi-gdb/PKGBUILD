@@ -1,0 +1,93 @@
+# Maintainer: Carlos Antunes <cmantunes@gmail.com>
+# Contributed by: nanodude
+
+_realname=gdb
+_target=arm-none-eabi
+_download_version=8-2018q4
+
+pkgbase=mingw-w64-${_target}-${_realname}
+pkgname=("${MINGW_PACKAGE_PREFIX}-${_target}-${_realname}")
+pkgver=8.2.50.d20181213
+pkgrel=1
+pkgdesc="GNU Tools for ARM Embedded Processors - GDB (mingw-w64)"
+arch=('any')
+url="https://launchpad.net/gcc-arm-embedded"
+license=('GPL' 'Various')
+groups=("${MINGW_PACKAGE_PREFIX}-${_target}-toolchain")
+depends=("${MINGW_PACKAGE_PREFIX}-readline"
+         "${MINGW_PACKAGE_PREFIX}-zlib")
+makedepends=("${MINGW_PACKAGE_PREFIX}-iconv"
+             "${MINGW_PACKAGE_PREFIX}-ncurses"
+             "${MINGW_PACKAGE_PREFIX}-xz"
+             'bison' 'tar')
+options=('staticlibs' '!debug' 'strip')
+source=("gcc-arm-embedded-${_download_version}.tar.bz2"::"https://developer.arm.com/-/media/Files/downloads/gnu-rm/${_download_version}/gcc-arm-none-eabi-8-2018-q4-major-src.tar.bz2?revision=bf2e4a67-c08c-49d5-b97d-17757cc8a77e")
+sha256sums=('bc228325dbbfaf643f2ee5d19e01d8b1873fcb9c31781b5e1355d40a68704ce7')
+noextract=("gcc-arm-embedded-${_download_version}.tar.bz2")
+
+prepare() {
+  # Extract packages from archive
+  rm -rf ${srcdir}/tmp
+  mkdir ${srcdir}/tmp && cd ${srcdir}/tmp
+  tar  xvf ../../gcc-arm-embedded-${_download_version}.tar.bz2 --strip-components=2
+
+  # Copy and extract GDB package
+  cp gdb.tar.bz2 ${srcdir}
+  cd ${srcdir}
+  tar -xf gdb.tar.bz2 --checkpoint=100
+}
+
+pkgver() {
+  cd ${srcdir}/${_realname}
+  local _version=$(head -n 34 gdb/version.in | sed -e 's/.* //' | tr -d '"\n')
+  local _date=$(grep BFD_VERSION_DATE bfd/version.h | sed -e 's/.* //' | tr -d '"\n')
+  printf "%s.d%s" ${_version//.DATE-git/} "$_date"
+}
+
+build() {
+  # Build GDB
+  cd $srcdir
+  rm -rf build-${CARCH}
+  mkdir -p build-${CARCH} && cd build-${CARCH}
+  ../${_realname}/configure \
+    --build="${MINGW_CHOST}" \
+    --host="${MINGW_CHOST}" \
+    --target="${_target}" \
+    --prefix="${MINGW_PREFIX}" \
+    --disable-werror \
+    --disable-nls \
+    --with-system-readline
+  make
+}
+
+package() {
+  cd ${srcdir}/build-${CARCH}
+  make -C gdb -j1 DESTDIR=${pkgdir} install
+
+  ## Remove files that conflict with arm-none-eabi-binutils
+  #rm -rf ${pkgdir}${MINGW_PREFIX}/share/man/man1
+  #rm -rf ${pkgdir}${MINGW_PREFIX}/arm-none-eabi
+  #rm -f ${pkgdir}${MINGW_PREFIX}/bin/arm-none-eabi-addr2line.exe
+  #rm -f ${pkgdir}${MINGW_PREFIX}/bin/arm-none-eabi-ar.exe
+  #rm -f ${pkgdir}${MINGW_PREFIX}/bin/arm-none-eabi-as.exe
+  #rm -f ${pkgdir}${MINGW_PREFIX}/bin/arm-none-eabi-c++filt.exe
+  #rm -f ${pkgdir}${MINGW_PREFIX}/bin/arm-none-eabi-elfedit.exe
+  #rm -f ${pkgdir}${MINGW_PREFIX}/bin/arm-none-eabi-gprof.exe
+  #rm -f ${pkgdir}${MINGW_PREFIX}/bin/arm-none-eabi-ld.bfd.exe
+  #rm -f ${pkgdir}${MINGW_PREFIX}/bin/arm-none-eabi-ld.exe
+  #rm -f ${pkgdir}${MINGW_PREFIX}/bin/arm-none-eabi-nm.exe
+  #rm -f ${pkgdir}${MINGW_PREFIX}/bin/arm-none-eabi-objcopy.exe
+  #rm -f ${pkgdir}${MINGW_PREFIX}/bin/arm-none-eabi-objdump.exe
+  #rm -f ${pkgdir}${MINGW_PREFIX}/bin/arm-none-eabi-ranlib.exe
+  #rm -f ${pkgdir}${MINGW_PREFIX}/bin/arm-none-eabi-readelf.exe
+  #rm -f ${pkgdir}${MINGW_PREFIX}/bin/arm-none-eabi-size.exe
+  #rm -f ${pkgdir}${MINGW_PREFIX}/bin/arm-none-eabi-strings.exe
+  #rm -f ${pkgdir}${MINGW_PREFIX}/bin/arm-none-eabi-strip.exe
+
+  # Remove files that conflict with host
+  rm -rf "${pkgdir}${MINGW_PREFIX}/share/info"
+  rm -rf "${pkgdir}${MINGW_PREFIX}/share/gdb"
+  rm -rf "${pkgdir}${MINGW_PREFIX}/include/gdb/jit-reader.h"
+  rm -rf "${pkgdir}${MINGW_PREFIX}/lib/libiberty.a"
+}
+
