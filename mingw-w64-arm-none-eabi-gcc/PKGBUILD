@@ -1,0 +1,137 @@
+# Maintainer: Carlos Antunes <cmantunes@gmail.com>
+# Contributed by: nanodude
+# Contributed by: stahta01
+
+_realname=gcc
+_target=arm-none-eabi
+_download_version=8-2018q4
+
+pkgbase=mingw-w64-${_target}-${_realname}
+# If newlib is missing, enable _build_boot_gcc
+#_build_boot_gcc=yes
+if [[ "${_build_boot_gcc}" == "yes" ]]; then
+  pkgname="${MINGW_PACKAGE_PREFIX}-${_target}-boot-${_realname}"
+  pkgdesc="The GNU bootstrap C compiler for the ARM microprocessor (mingw-w64)"
+else
+  pkgname="${MINGW_PACKAGE_PREFIX}-${_target}-${_realname}"
+  pkgdesc="The GNU C++ compiler for the ARM microprocessor (mingw-w64)"
+fi
+pkgver=8.2.1.d20181213
+pkgrel=1
+arch=('any')
+url="https://launchpad.net/gcc-arm-embedded"
+license=('GPL' 'Various')
+groups=(${MINGW_PACKAGE_PREFIX}-${_target}-toolchain)
+replaces=(${MINGW_PACKAGE_PREFIX}-${_target}-boot-${_realname})
+provides=(${MINGW_PACKAGE_PREFIX}-${_target}-boot-${_realname})
+conflicts=(${MINGW_PACKAGE_PREFIX}-${_target}-boot-${_realname})
+depends=(${MINGW_PACKAGE_PREFIX}-${_target}-binutils)
+_makedepends=('diffutils' 'make' 'tar' 'texinfo')
+if [[ "${_build_boot_gcc}" == "yes" ]]; then
+  makedepends=(${_makedepends[@]})
+else
+  makedepends=(${_makedepends[@]} ${MINGW_PACKAGE_PREFIX}-${_target}-newlib)
+fi
+optdepends=("${MINGW_PACKAGE_PREFIX}-${_target}-newlib: Standard C library optimized for embedded systems")
+options=('staticlibs' '!debug' '!strip')
+source=("gcc-arm-embedded-${_download_version}.tar.bz2"::"https://developer.arm.com/-/media/Files/downloads/gnu-rm/${_download_version}/gcc-arm-none-eabi-8-2018-q4-major-src.tar.bz2?revision=bf2e4a67-c08c-49d5-b97d-17757cc8a77e")
+sha256sums=('bc228325dbbfaf643f2ee5d19e01d8b1873fcb9c31781b5e1355d40a68704ce7')
+noextract=("gcc-arm-embedded-${_download_version}.tar.bz2")
+
+prepare() {
+  # Extract packages from archive
+  rm -rf ${srcdir}/tmp
+  mkdir ${srcdir}/tmp && cd ${srcdir}/tmp
+  tar xvf ../../gcc-arm-embedded-${_download_version}.tar.bz2 --strip-components=2
+
+  # Copy and extract GCC package
+  cp gcc.tar.bz2 ${srcdir}
+  cd ${srcdir}
+  [ -d gcc ] && rm -rf gcc
+  tar xf gcc.tar.bz2 --checkpoint=100
+
+  # GCC
+  cd "${srcdir}/gcc"
+}
+
+pkgver() {
+  cd ${srcdir}/${_realname}
+  local _version=$(head -n 34 gcc/BASE-VER | sed -e 's/.* //' | tr -d '"\n')
+  local _date=$(head -n 34 gcc/DATESTAMP | sed -e 's/.* //' | tr -d '"\n')
+  printf "%s.d%s" "$_version" "$_date"
+}
+
+build() {
+  # Build GCC
+  cd $srcdir
+  rm -rf build-${CARCH}
+  mkdir -p build-${CARCH} && cd build-${CARCH}
+  unset CFLAGS
+  unset CXXFLAGS
+
+  local -a _gcc_pass_cfg_options
+  if [[ "${_build_boot_gcc}" == "yes" ]]; then
+    _gcc_pass_cfg_options+=("--without-headers")
+    _gcc_pass_cfg_options+=("--with-sysroot=${MINGW_PREFIX}/${_target}")
+    _gcc_pass_cfg_options+=("--enable-languages=c")
+  else
+    _gcc_pass_cfg_options+=("--with-headers=${MINGW_PREFIX}/${_target}/include")
+    _gcc_pass_cfg_options+=("--with-sysroot=${MINGW_PREFIX}/${_target}")
+    _gcc_pass_cfg_options+=("--enable-languages=c,c++")
+  fi
+
+  CFLAGS="-g -O2 -fdata-sections -ffunction-sections"
+  CXXFLAGS="${CFLAGS}"
+  ../${_realname}/configure \
+    "${_gcc_pass_cfg_options[@]}" \
+    --with-newlib \
+    --build="${MINGW_CHOST}" \
+    --host="${MINGW_CHOST}" \
+    --target="${_target}" \
+    --prefix="${MINGW_PREFIX}" \
+    --disable-werror \
+    --disable-lto \
+    --disable-nls \
+    --disable-libffi \
+    --disable-decimal-float \
+    --disable-libgomp \
+    --disable-libmudflap \
+    --disable-libquadmath \
+    --disable-libssp \
+    --disable-libstdcxx-pch \
+    --disable-libsanitizer \
+    --disable-threads \
+    --disable-tls \
+    --disable-shared \
+    --enable-multilib \
+    --enable-interwork \
+    --with-native-system-header-dir=/include \
+    --with-gnu-as \
+    --with-gnu-ld \
+    --with-system-zlib \
+    --with-python-dir="share/${_target}-${_realname}" \
+    --with-libelf \
+    --with-{gmp,mpfr,mpc,isl}="${MINGW_PREFIX}" \
+    --without-cloog \
+    --disable-isl-version-check \
+    --with-host-libstdcxx="-static-libgcc -Wl,-Bstatic,-lstdc++,-Bdynamic -lm"
+  if [[ "${_build_boot_gcc}" == "yes" ]]; then
+    make all-gcc
+  else
+    make
+  fi
+}
+
+package() {
+  cd ${srcdir}/build-${CARCH}
+
+  if [[ "${_build_boot_gcc}" == "yes" ]]; then
+    make -j1 DESTDIR=${pkgdir} install-gcc
+  else
+    make -j1 DESTDIR=${pkgdir} install
+  fi
+
+  # Remove files that conflict with host
+  rm -rf "${pkgdir}${MINGW_PREFIX}/share/info"
+}
+
