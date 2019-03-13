@@ -1,0 +1,52 @@
+# Maintainer: Carlos Antunes <cmantunes@gmail.com>
+# Contributed by: nanodude
+
+_realname=binutils
+_target=arm-none-eabi
+
+pkgbase=mingw-w64-${_target}-${_realname}
+pkgname=("${MINGW_PACKAGE_PREFIX}-${_target}-${_realname}")
+pkgver=2.32
+pkgrel=1
+pkgdesc="GNU Tools for ARM Embedded Processors - Binutils (mingw-w64)"
+arch=('any')
+url="https://www.gnu.org/software/binutils/"
+license=('GPL')
+groups=("${MINGW_PACKAGE_PREFIX}-${_target}-toolchain")
+depends=("${MINGW_PACKAGE_PREFIX}-libiconv" "${MINGW_PACKAGE_PREFIX}-zlib")
+makedepends=('bison' 'make' 'texinfo')
+options=('staticlibs')
+source=("https://mirrors.kernel.org/sources.redhat.com/${_realname}/releases/${_realname}-${pkgver}.tar.bz2")
+sha256sums=('de38b15c902eb2725eac6af21183a5f34ea4634cb0bcef19612b50e5ed31072d')
+
+build() {
+  if check_option "debug" "y"; then
+    CFLAGS+=" -g -O0"
+  fi
+  cd $srcdir
+  rm -rf build-${CARCH}
+  mkdir -p build-${CARCH} && cd build-${CARCH}
+  ../${_realname}-${pkgver}/configure \
+    --build="${MINGW_CHOST}" \
+    --host="${MINGW_CHOST}" \
+    --target="${_target}" \
+    --prefix="${MINGW_PREFIX}" \
+    --disable-werror \
+    --disable-lto \
+    --with-sysroot="${MINGW_PREFIX}" \
+    --with-system-zlib \
+    --with-libiconv-prefix=${MINGW_PREFIX} \
+    --disable-nls \
+    --disable-rpath \
+    --enable-multilib \
+    --enable-interwork
+  make
+}
+
+package() {
+  cd ${srcdir}/build-${CARCH}
+  make DESTDIR=${pkgdir} install
+
+  # Remove unwanted files
+  rm -rf ${pkgdir}${MINGW_PREFIX}/share/info
+}
