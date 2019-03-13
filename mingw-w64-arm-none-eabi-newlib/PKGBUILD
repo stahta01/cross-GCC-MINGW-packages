@@ -1,0 +1,100 @@
+# Maintainer: Carlos Antunes <cmantunes@gmail.com>
+# Contributed by: nanodude
+# Contributed by: stahta01
+
+_realname=newlib
+_target=arm-none-eabi
+_use_download_version=0 # Set to one to use _download_version
+_download_version=8-2018q4
+
+pkgbase=mingw-w64-${_target}-${_realname}
+pkgname=("${MINGW_PACKAGE_PREFIX}-${_target}-${_realname}")
+if [[ "${_use_download_version}" == 1 ]]; then
+  if [[ "${_download_version}" == "8-2018q4" ]]; then
+    pkgver=3.0.0
+  else
+    pkgver=0.0.0
+  fi
+  _foldername=${_realname}
+else
+  pkgver=3.0.0.20180831
+  _foldername=${_realname}-${pkgver}
+fi
+
+pkgrel=1
+pkgdesc="GNU Tools for ARM Embedded Processors - Newlib (mingw-w64)"
+arch=('any')
+url="https://sourceware.org/newlib/"
+license=('Various')
+groups=("${MINGW_PACKAGE_PREFIX}-${_target}-toolchain")
+depends=("${MINGW_PACKAGE_PREFIX}-${_target}-binutils")
+makedepends=(${MINGW_PACKAGE_PREFIX}-${_target}-boot-gcc 'make' 'patch' 'tar')
+options=('staticlibs' '!strip' '!emptydirs')
+if [[ "${_use_download_version}" == 1 ]]; then
+  _source=("gcc-arm-embedded-${_download_version}.tar.bz2"::"https://developer.arm.com/-/media/Files/downloads/gnu-rm/${_download_version}/gcc-arm-none-eabi-8-2018-q4-major-src.tar.bz2?revision=bf2e4a67-c08c-49d5-b97d-17757cc8a77e")
+  _sha256sums=('bc228325dbbfaf643f2ee5d19e01d8b1873fcb9c31781b5e1355d40a68704ce7')
+else
+  _source=("ftp://sourceware.org/pub/newlib/newlib-${pkgver}.tar.gz")
+  _sha256sums=('3ad3664f227357df15ff34e954bfd9f501009a647667cd307bf0658aefd6eb5b')
+fi
+source=(${_source[@]} '10-newlib-arm-dynamic-reent.patch')
+sha256sums=(${_sha256sums[@]} '7522f26659a69e2f02eb37d3557f8dca08bc32ada8c797b6a812ad131c87b0ef')
+if [[ "${_use_download_version}" == 1 ]]; then
+  noextract=("gcc-arm-embedded-${_download_version}.tar.bz2")
+fi
+
+prepare() {
+if [[ "${_use_download_version}" == 1 ]]; then
+    # Extract packages from archive
+    rm -rf ${srcdir}/tmp
+    mkdir ${srcdir}/tmp && cd ${srcdir}/tmp
+    tar  xvf ../../gcc-arm-embedded-${_download_version}.tar.bz2 --strip-components=2
+
+    # Copy and extract GDB package
+    cp ${_realname}.tar.bz2 ${srcdir}
+    cd ${srcdir}
+    tar -xf ${_realname}.tar.bz2 --checkpoint=100
+fi
+
+  # Newlib
+  cd ${srcdir}/${_foldername}
+  patch -p1 -i "${srcdir}/10-newlib-arm-dynamic-reent.patch"
+}
+
+build() {
+  # Build newlib
+  if check_option "debug" "y"; then
+    NEWLIB_CFLAGS="-O0"
+  else
+    NEWLIB_CFLAGS="-O3"
+  fi
+  NEWLIB_CFLAGS+=" -g -ffunction-sections -fdata-sections"
+#  NEWLIB_CFLAGS+=" -DMALLOC_PROVIDED"
+#  NEWLIB_CFLAGS+=" -DREENTRANT_SYSCALLS_PROVIDED"
+  cd $srcdir
+  rm -rf build-${CARCH}
+  mkdir -p build-${CARCH} && cd build-${CARCH}
+  ../${_foldername}/configure \
+    --build=${MINGW_CHOST} \
+    --host=${MINGW_CHOST} \
+    --target=${_target} \
+    --prefix=${MINGW_PREFIX} \
+    --enable-newlib-io-pos-args \
+    --enable-newlib-io-c99-formats \
+    --enable-newlib-io-long-long \
+    --enable-newlib-io-float \
+    --enable-newlib-reent-small \
+    --disable-newlib-supplied-syscalls \
+    --disable-nls \
+    CFLAGS="${NEWLIB_CFLAGS}"
+  make
+}
+
+package() {
+  cd ${srcdir}/build-${CARCH}
+  make -j1 DESTDIR=${pkgdir} install
+
+  # Remove files that conflict with host
+  rm -rf "${pkgdir}${MINGW_PREFIX}/share/info"
+}
+
