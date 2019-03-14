@@ -1,13 +1,17 @@
-*.tar
-*.tar.*
+*.pkg.tar.xz
 *.jar
 *.exe
 *.msi
 *.zip
 *.tgz
 *.log
-*.log.*
 *.sig
+*.tar
+*.tar.*
+*.log.*
+logpipe.*.lnk
 
 pkg/
 src/
+/*-git/*-git/
+/*-svn/*-svn/
