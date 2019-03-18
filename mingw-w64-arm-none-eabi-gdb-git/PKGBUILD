@@ -1,0 +1,68 @@
+# Maintainer: Carlos Antunes <cmantunes@gmail.com>
+# Contributed by: nanodude
+
+_realname=gdb
+_target=arm-none-eabi
+#_gittag=users/ARM/embedded-gdb-8.1-branch-2018q2
+_gittag=users/ARM/embedded-gdb-master-2018q4
+
+pkgbase=mingw-w64-${_target}-${_realname}-git
+pkgname=("${MINGW_PACKAGE_PREFIX}-${_target}-${_realname}-git")
+pkgver=8.2.50.d20181213.gfe554d200d
+#pkgver=8.2.50.20181213_git
+pkgrel=1
+pkgdesc="GNU Tools for ARM Embedded Processors - GDB (mingw-w64)"
+arch=('any')
+url="https://developer.arm.com/open-source/gnu-toolchain/gnu-rm"
+license=('GPL' 'Various')
+groups=("${MINGW_PACKAGE_PREFIX}-${_target}-toolchain")
+conflicts=(${MINGW_PACKAGE_PREFIX}-${_target}-${_realname})
+depends=(
+  "${MINGW_PACKAGE_PREFIX}-readline"
+  "${MINGW_PACKAGE_PREFIX}-zlib"
+)
+makedepends=(
+  "${MINGW_PACKAGE_PREFIX}-iconv"
+  "${MINGW_PACKAGE_PREFIX}-ncurses"
+  "${MINGW_PACKAGE_PREFIX}-xz"
+  'bison' 'git' 'make' 'texinfo'
+)
+options=('staticlibs' '!debug' 'strip')
+source=(${_realname}-git::"git://sourceware.org/git/binutils-gdb.git#tag=${_gittag}")
+sha256sums=('SKIP')
+# prepare() { }
+
+pkgver() {
+  cd ${srcdir}/${_realname}-git
+  local _version=$(head -n 34 gdb/version.in | sed -e 's/.* //' | tr -d '"\n')
+  local _date=$(grep BFD_VERSION_DATE bfd/version.h | sed -e 's/.* //' | tr -d '"\n')
+  printf "%s.d%s.g%s" ${_version//.DATE-git/} "$_date" "$(git rev-parse --short HEAD)"
+}
+
+build() {
+  # Build GDB
+  cd $srcdir
+  rm -rf build-${CARCH}
+  mkdir -p build-${CARCH} && cd build-${CARCH}
+  ../${_realname}-git/configure \
+    --build="${MINGW_CHOST}" \
+    --host="${MINGW_CHOST}" \
+    --target="${_target}" \
+    --prefix="${MINGW_PREFIX}" \
+    --disable-werror \
+    --disable-nls \
+    --with-system-readline
+  make
+}
+
+package() {
+  cd ${srcdir}/build-${CARCH}
+  make -C gdb -j1 DESTDIR=${pkgdir} install
+
+  # Remove files that conflict with host
+  rm -rf "${pkgdir}${MINGW_PREFIX}/share/info"
+  rm -rf "${pkgdir}${MINGW_PREFIX}/share/gdb"
+  rm -rf "${pkgdir}${MINGW_PREFIX}/include/gdb/jit-reader.h"
+  rm -rf "${pkgdir}${MINGW_PREFIX}/lib/libiberty.a"
+}
+
