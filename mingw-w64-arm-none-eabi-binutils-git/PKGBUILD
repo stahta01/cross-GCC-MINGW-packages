@@ -1,0 +1,69 @@
+# Maintainer: Carlos Antunes <cmantunes@gmail.com>
+# Contributed by: nanodude
+
+_realname=binutils
+_target=arm-none-eabi
+_gittag=users/ARM/embedded-binutils-master-2018q4
+
+pkgbase=mingw-w64-${_target}-${_realname}-git
+pkgname=("${MINGW_PACKAGE_PREFIX}-${_target}-${_realname}-git")
+pkgver='2.31.51'.gfe554d200d
+pkgrel=1
+pkgdesc="GNU Tools for ARM Embedded Processors - Binutils (mingw-w64)"
+arch=('any')
+url="https://www.gnu.org/software/binutils/"
+license=('GPL')
+groups=("${MINGW_PACKAGE_PREFIX}-${_target}-toolchain")
+conflicts=(${MINGW_PACKAGE_PREFIX}-${_target}-${_realname})
+provides=(${MINGW_PACKAGE_PREFIX}-${_target}-${_realname})
+depends=("${MINGW_PACKAGE_PREFIX}-libiconv" "${MINGW_PACKAGE_PREFIX}-zlib")
+makedepends=('bison' 'diffutils' 'git' 'make' 'texinfo')
+options=('staticlibs')
+source=(${_realname}-git::"git://sourceware.org/git/binutils-gdb.git#tag=${_gittag}")
+sha256sums=('SKIP')
+# prepare() { }
+
+pkgver() {
+  cd ${srcdir}/${_realname}-git
+  # PACKAGE_VER replaces with space the following 'PACKAGE_VERSION=', '\n', '-', '/', and single quote.
+  local PACKAGE_VER=$(grep PACKAGE_VERSION= binutils/configure | tr 'PACKAGE_VERSION=' ' ' | tr '\n' ' '  | tr '-' ' '  | tr '/' ' ' | tr '\047' ' ' )
+  printf "%s.g%s" ${PACKAGE_VER// /} "$(git rev-parse --short HEAD)"
+}
+
+build() {
+  if check_option "debug" "y"; then
+    CFLAGS+=" -g -O0"
+  fi
+  cd $srcdir
+  rm -rf build-${CARCH}
+  mkdir -p build-${CARCH} && cd build-${CARCH}
+  ../${_realname}-git/configure \
+    --build="${MINGW_CHOST}" \
+    --host="${MINGW_CHOST}" \
+    --target="${_target}" \
+    --prefix="${MINGW_PREFIX}" \
+    --disable-werror \
+    --disable-lto \
+    --with-sysroot="${MINGW_PREFIX}" \
+    --with-system-zlib \
+    --with-libiconv-prefix=${MINGW_PREFIX} \
+    --disable-nls \
+    --disable-rpath \
+    --enable-multilib \
+    --enable-interwork
+  make
+}
+
+package() {
+  cd ${srcdir}/build-${CARCH}
+  make DESTDIR=${pkgdir} install
+
+  # Remove unwanted files and folders
+  rm -f  ${pkgdir}${MINGW_PREFIX}/bin/arm-none-eabi-gdb-add-index
+  rm -f  ${pkgdir}${MINGW_PREFIX}/bin/arm-none-eabi-gdb.exe
+  rm -f  ${pkgdir}${MINGW_PREFIX}/include/gdb/jit-reader.h
+  rm -f  ${pkgdir}${MINGW_PREFIX}/share/man/man1/arm-none-eabi-gdb*
+  rm -f  ${pkgdir}${MINGW_PREFIX}/share/man/man5/arm-none-eabi-gdb*
+  rm -rf ${pkgdir}${MINGW_PREFIX}/share/gdb
+  rm -rf ${pkgdir}${MINGW_PREFIX}/share/info
+}
