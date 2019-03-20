@@ -1,0 +1,87 @@
+# Maintainer: Carlos Antunes <cmantunes@gmail.com>
+# Contributed by: nanodude
+# Contributed by: stahta01
+
+# Warning this package requires a short path for it to build without errors.
+# C:\repos\git\cross-packages\mingw-w64-arm-none-eabi-newlib-git
+# The above path worked for me; But, one about 10 characters longer did not.
+
+_realname=newlib
+_target=arm-none-eabi
+_use_commit=0 # Set to 1 to use the commit below
+_commit=df6915f029ac9acd2b479ea898388cbd7dda4974    # 8-2018q4
+
+pkgbase=mingw-w64-${_target}-${_realname}-git
+pkgname=("${MINGW_PACKAGE_PREFIX}-${_target}-${_realname}-git")
+pkgver=3.1.0.ge8b23909e
+pkgrel=1
+pkgdesc="GNU Tools for ARM Embedded Processors - Newlib (mingw-w64)"
+arch=('any')
+url="https://sourceware.org/newlib/"
+license=('Various')
+groups=("${MINGW_PACKAGE_PREFIX}-${_target}-toolchain")
+conflicts=(${MINGW_PACKAGE_PREFIX}-${_target}-${_realname})
+provides=(${MINGW_PACKAGE_PREFIX}-${_target}-${_realname})
+depends=("${MINGW_PACKAGE_PREFIX}-${_target}-binutils")
+makedepends=(${MINGW_PACKAGE_PREFIX}-${_target}-boot-gcc 'git' 'make' 'patch')
+options=('staticlibs' '!strip' '!emptydirs')
+
+if [[ "${_use_commit}" == 1 ]]; then
+source=(${_realname}-git::"git://sourceware.org/git/newlib-cygwin.git#commit=${_commit}"
+        '10-newlib-arm-dynamic-reent.patch')
+else
+source=(${_realname}-git::"git://sourceware.org/git/newlib-cygwin.git"
+        '10-newlib-arm-dynamic-reent.patch')
+fi
+sha256sums=('SKIP'
+            '7522f26659a69e2f02eb37d3557f8dca08bc32ada8c797b6a812ad131c87b0ef')
+prepare() {
+  # Newlib
+  cd ${srcdir}/${_realname}-git
+  patch -p1 -i "${srcdir}/10-newlib-arm-dynamic-reent.patch"
+}
+
+pkgver() {
+  cd ${srcdir}/${_realname}-git
+  # PACKAGE_VER replaces with space the following 'PACKAGE_VERSION=', '\n', '-', '/', and single quote.
+  local PACKAGE_VER=$(grep PACKAGE_VERSION= newlib/configure | tr 'PACKAGE_VERSION=' ' ' | tr '\n' ' '  | tr '-' ' '  | tr '/' ' ' | tr '\047' ' ' )
+  printf "%s.g%s" ${PACKAGE_VER// /} "$(git rev-parse --short HEAD)"
+}
+
+build() {
+  # Build newlib
+  if check_option "debug" "y"; then
+    NEWLIB_CFLAGS="-O0"
+  else
+    NEWLIB_CFLAGS="-O3"
+  fi
+  NEWLIB_CFLAGS+=" -g -ffunction-sections -fdata-sections"
+#  NEWLIB_CFLAGS+=" -DMALLOC_PROVIDED"
+#  NEWLIB_CFLAGS+=" -DREENTRANT_SYSCALLS_PROVIDED"
+  cd $srcdir
+  rm -rf build-${CARCH}
+  mkdir -p build-${CARCH} && cd build-${CARCH}
+  ../${_realname}-git/configure \
+    --build=${MINGW_CHOST} \
+    --host=${MINGW_CHOST} \
+    --target=${_target} \
+    --prefix=${MINGW_PREFIX} \
+    --enable-newlib-io-pos-args \
+    --enable-newlib-io-c99-formats \
+    --enable-newlib-io-long-long \
+    --enable-newlib-io-float \
+    --enable-newlib-reent-small \
+    --disable-newlib-supplied-syscalls \
+    --disable-nls \
+    CFLAGS="${NEWLIB_CFLAGS}"
+  make
+}
+
+package() {
+  cd ${srcdir}/build-${CARCH}
+  make -j1 DESTDIR=${pkgdir} install
+
+  # Remove files that conflict with host
+  rm -rf "${pkgdir}${MINGW_PREFIX}/share/info"
+}
+
