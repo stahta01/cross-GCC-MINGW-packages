@@ -8,10 +8,6 @@
 *.sig
 *.tar
 *.tar.*
-*.log.*
-logpipe.*.lnk
 
-pkg/
-src/
 /*-git/*-git/
 /*-svn/*-svn/
