@@ -13,7 +13,7 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}-git"
          "${MINGW_PACKAGE_PREFIX}-${_realname}-fortran-git"
          "${MINGW_PACKAGE_PREFIX}-${_realname}-ada-git"
          "${MINGW_PACKAGE_PREFIX}-${_realname}-objc-git")
-pkgver=8.0.0.d20170420.c10.g498621e8159
+pkgver=8.0.0.d20170715.c10.g2f9dfa0599b
 pkgrel=1
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
@@ -42,9 +42,10 @@ options=('staticlibs' '!emptydirs' '!strip' 'debug')
 #_branch=gcc-7-branch
 #_branch=gcc-8-branch
 #_branch=master
-_commit=498621e8159c1f494a9b8a5f2c3e5225c74ed242 # 8.0.0.d20170420 SVN 247017
-#_commit=b9e53b79c9660edbe626137c1c80b6bebfa1d1e2 # 8.0.0.d20170908 does not have diff. error; has Same g-exptty.adb error as newer version
-#_commit=faee1e180ddba56b9419076ace576295674f3b76 # 8.0.0.d20170912 does not have diff. error; has Same g-exptty.adb error as newer version
+#_commit=498621e8159c1f494a9b8a5f2c3e5225c74ed242 # 8.0.0.d20170420 Builds using 6.5.0.d20181026
+_commit=2f9dfa0599bb2c7e58b391b6621924c48b8326a8 # 8.0.0.d20170715
+#_commit=b9e53b79c9660edbe626137c1c80b6bebfa1d1e2 # 8.0.0.d20170908 has Same g-exptty.adb error as newer version
+#_commit=faee1e180ddba56b9419076ace576295674f3b76 # 8.0.0.d20170912 has Same g-exptty.adb error as newer version
 #_commit=bd3a898090e445d324faf7390adc7fc0af10c17d # 8.0.1 different error
 #_commit=5baca0204960507a98c364c80f77f7a43be4e36b # 8.1.0 Same g-exptty.adb error as newer version
 
