@@ -13,7 +13,7 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}-git"
          "${MINGW_PACKAGE_PREFIX}-${_realname}-fortran-git"
          "${MINGW_PACKAGE_PREFIX}-${_realname}-ada-git"
          "${MINGW_PACKAGE_PREFIX}-${_realname}-objc-git")
-pkgver=8.0.0.d20170425.c10.g6daacbc8271
+pkgver=8.0.0.d20170425.c10.g30d41d6f8a0
 pkgrel=1
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
@@ -43,7 +43,8 @@ options=('staticlibs' '!emptydirs' '!strip' 'debug')
 #_branch=gcc-8-branch
 #_branch=master
 #_commit=498621e8159c1f494a9b8a5f2c3e5225c74ed242 # 8.0.0.d20170420 Builds using 6.5.0.d20181026
-_commit=6daacbc82711db7e61eacbdefaf79f258dec0164 # 8.0.0.d20170425
+#_commit=6daacbc82711db7e61eacbdefaf79f258dec0164 # 8.0.0.d20170425 cc1.exe: internal compiler error: Segmentation fault
+_commit=30d41d6f8a005193b761785a544aed37a4e628fe # 8.0.0.d20170425
 #_commit=56580d6b97f3732e05674902ad78a0f3e9f55335 # 8.0.0.d20170502 tree.h:901:42: error: 'tree_check2' was not declared in this scope
 #_commit=7be8a96829b8a8e9f301a563aaab0ccce9ee4a0f # 8.0.0.d20170522 read-md.c:216:28: error: function 'void message_at_1
 #_commit=2f9dfa0599bb2c7e58b391b6621924c48b8326a8 # 8.0.0.d20170715 Error detected around ../../gcc-git/gcc/ada/ali.adb:1029:15
@@ -149,13 +150,6 @@ build() {
       local _conf=""
     ;;
   esac
-
-  echo "CARCH         := ${CARCH}"
-  echo "MINGW_CHOST   := ${MINGW_CHOST}"
-  echo "MINGW_PREFIX  := ${MINGW_PREFIX}"
-  echo "PATH          := ${PATH}"
-  echo "_arch         := ${_arch}"
-  echo "_threads      := ${_threads}"
 
   ../${_realname}-git/configure \
     --prefix=${MINGW_PREFIX} \
