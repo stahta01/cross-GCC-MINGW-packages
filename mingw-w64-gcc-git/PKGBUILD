@@ -13,7 +13,7 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}-git"
          "${MINGW_PACKAGE_PREFIX}-${_realname}-fortran-git"
          "${MINGW_PACKAGE_PREFIX}-${_realname}-ada-git"
          "${MINGW_PACKAGE_PREFIX}-${_realname}-objc-git")
-pkgver=9.0.0.d20180425.c10.g949bc65ce4d
+pkgver=8.0.0.d20170829.c10.ge1ce2ea999b
 pkgrel=1
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
@@ -47,11 +47,9 @@ options=('staticlibs' '!emptydirs' '!strip' 'debug')
 #_commit=56580d6b97f3732e05674902ad78a0f3e9f55335 # 8.0.0.d20170502 tree.h:901:42: error: 'tree_check2' was not declared in this scope
 #_commit=7be8a96829b8a8e9f301a563aaab0ccce9ee4a0f # 8.0.0.d20170522 read-md.c:216:28: error: function 'void message_at_1
 #_commit=2f9dfa0599bb2c7e58b391b6621924c48b8326a8 # 8.0.0.d20170715 Error detected around ../../gcc-git/gcc/ada/ali.adb:1029:15
-#_commit=b9e53b79c9660edbe626137c1c80b6bebfa1d1e2 # 8.0.0.d20170908 has Same g-exptty.adb error as newer version
-#_commit=faee1e180ddba56b9419076ace576295674f3b76 # 8.0.0.d20170912 has Same g-exptty.adb error as newer version
-#115e60dc65ba3700a8ea2815e09b0e06e1877145
-#_commit=bd3a898090e445d324faf7390adc7fc0af10c17d # 8.0.1 different error
-_commit=949bc65ce4d0d7dd036ccfb279bffe63d02feee6 # 9.0.0.d20180425
+_commit=e1ce2ea999b806a5958f46058ca113bf8e7b4d0e # 8.0.0.d20170829
+#_commit=5a3763032ae61efdc10c8be21b2a1a1a511f8735 # 8.0.0.d20170903 has g-exptty.adb xgcc internal error
+#_commit=949bc65ce4d0d7dd036ccfb279bffe63d02feee6 # 9.0.0.d20180425 has g-exptty.adb xgcc internal error
 
 # git+https://gcc.gnu.org/git/gcc.git#branch=${_branch}
 #source=(${_realname}-git::"git://gcc.gnu.org/git/gcc.git#branch=${_branch}"
