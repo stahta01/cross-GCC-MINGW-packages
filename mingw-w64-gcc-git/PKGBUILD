@@ -13,7 +13,7 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}-git"
          "${MINGW_PACKAGE_PREFIX}-${_realname}-fortran-git"
          "${MINGW_PACKAGE_PREFIX}-${_realname}-ada-git"
          "${MINGW_PACKAGE_PREFIX}-${_realname}-objc-git")
-pkgver=8.0.0.d20170426.c10.g210a347add1
+pkgver=8.0.0.d20170427.c10.g1c164d44cc6
 pkgrel=1
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
@@ -42,13 +42,15 @@ options=('staticlibs' '!emptydirs' '!strip' 'debug')
 #_branch=gcc-7-branch
 #_branch=gcc-8-branch
 #_branch=master
-#_commit=498621e8159c1f494a9b8a5f2c3e5225c74ed242 # 8.0.0.d20170420 Builds using 6.5.0.d20181026
-#_commit=30d41d6f8a005193b761785a544aed37a4e628fe # 8.0.0.d20170425 Builds using 6.5.0.d20181026
-_commit=210a347add12c60f9016939b4a9a4e93a3697d73 # 8.0.0.d20170426
-#755a1f33cc394a631ee4547d443b802109e80772
-#cc2b4f76e050c87b61becc717c1422b5dba28ceb
+#_commit=210a347add12c60f9016939b4a9a4e93a3697d73 # 8.0.0.d20170426 Builds using 6.5.0.d20181026
+#755a1f33cc394a631ee4547d443b802109e80772 # 193 SVN 247291
+#e309c6a600e5fad060c61ae2d24c4470597abf6d # 201 SVN 247300
+_commit=1c164d44cc680e9d2b6d1ca6f03adaf59f1bf072 # 212 SVN 247314
+#6e3e2cf4ea94951aae44a0ba93c9dc235798224f # 222 SVN 247326
+#cc2b4f76e050c87b61becc717c1422b5dba28ceb # 233 SVN 247339
+#98abd9ff7d04b28d0819e3c9a118e6024f66095c # 237 SVN 247346
 #_commit=2874228166c82e811d1f401255ebbee1f441c87e # 8.0.0.d20170428 has g-exptty.adb xgcc internal error
-#_commit=949bc65ce4d0d7dd036ccfb279bffe63d02feee6 # 9.0.0.d20180425 has g-exptty.adb xgcc internal error
+# Fails means has g-exptty.adb xgcc internal error
 
 # git+https://gcc.gnu.org/git/gcc.git#branch=${_branch}
 #source=(${_realname}-git::"git://gcc.gnu.org/git/gcc.git#branch=${_branch}"
@@ -167,7 +169,7 @@ build() {
     --enable-fully-dynamic-string \
     --enable-libstdcxx-time=yes \
     --disable-libstdcxx-pch \
-    --enable-libstdcxx-debug \
+    --disable-libstdcxx-debug \
     --disable-isl-version-check \
     --enable-lto \
     --enable-libgomp \
