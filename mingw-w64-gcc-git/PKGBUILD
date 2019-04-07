@@ -13,7 +13,7 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}-git"
          "${MINGW_PACKAGE_PREFIX}-${_realname}-fortran-git"
          "${MINGW_PACKAGE_PREFIX}-${_realname}-ada-git"
          "${MINGW_PACKAGE_PREFIX}-${_realname}-objc-git")
-pkgver=8.0.0.d20170428.c10.g2874228166c
+pkgver=8.0.0.d20170426.c10.g210a347add1
 pkgrel=1
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
@@ -44,16 +44,10 @@ options=('staticlibs' '!emptydirs' '!strip' 'debug')
 #_branch=master
 #_commit=498621e8159c1f494a9b8a5f2c3e5225c74ed242 # 8.0.0.d20170420 Builds using 6.5.0.d20181026
 #_commit=30d41d6f8a005193b761785a544aed37a4e628fe # 8.0.0.d20170425 Builds using 6.5.0.d20181026
-#210a347add12c60f9016939b4a9a4e93a3697d73 # 8.0.0
-_commit=2874228166c82e811d1f401255ebbee1f441c87e # 8.0.0.d20170428
-#_commit=56580d6b97f3732e05674902ad78a0f3e9f55335 # 8.0.0.d20170502 tree.h:901:42: error: 'tree_check2' was not declared in this scope
-#_commit=7be8a96829b8a8e9f301a563aaab0ccce9ee4a0f # 8.0.0.d20170522 read-md.c:216:28: error: function 'void message_at_1
-#_commit=2f9dfa0599bb2c7e58b391b6621924c48b8326a8 # 8.0.0.d20170715 Error detected around ../../gcc-git/gcc/ada/ali.adb:1029:15
-#383803ae373ba328bbbc406ce1457460dc00c5e4
-#e49e68cd32ed11e93df38a6fd5d007fb543e9779
-#6f6f1ef4317b35a760a7e96784f648c4724c4ca4
-#45513501f51e7f69dfda12fe4bd2e9ecf844fd25 # 8.0.0
-#_commit=e1ce2ea999b806a5958f46058ca113bf8e7b4d0e # 8.0.0.d20170829 has g-exptty.adb xgcc internal error
+_commit=210a347add12c60f9016939b4a9a4e93a3697d73 # 8.0.0.d20170426
+#755a1f33cc394a631ee4547d443b802109e80772
+#cc2b4f76e050c87b61becc717c1422b5dba28ceb
+#_commit=2874228166c82e811d1f401255ebbee1f441c87e # 8.0.0.d20170428 has g-exptty.adb xgcc internal error
 #_commit=949bc65ce4d0d7dd036ccfb279bffe63d02feee6 # 9.0.0.d20180425 has g-exptty.adb xgcc internal error
 
 # git+https://gcc.gnu.org/git/gcc.git#branch=${_branch}
