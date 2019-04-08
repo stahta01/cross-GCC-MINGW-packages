@@ -44,13 +44,13 @@ options=('staticlibs' '!emptydirs' '!strip' 'debug')
 #_branch=master
 #_commit=210a347add12c60f9016939b4a9a4e93a3697d73 # 8.0.0.d20170426 Builds using 6.5.0.d20181026
 #755a1f33cc394a631ee4547d443b802109e80772 # 193 SVN 247291
-#e309c6a600e5fad060c61ae2d24c4470597abf6d # 201 SVN 247300
-_commit=1c164d44cc680e9d2b6d1ca6f03adaf59f1bf072 # 212 SVN 247314
+#e309c6a600e5fad060c61ae2d24c4470597abf6d # 201 SVN 247300 Fails/No build error
+_commit=1c164d44cc680e9d2b6d1ca6f03adaf59f1bf072 # 212 SVN 247314 Fails/No build error
 #6e3e2cf4ea94951aae44a0ba93c9dc235798224f # 222 SVN 247326
-#cc2b4f76e050c87b61becc717c1422b5dba28ceb # 233 SVN 247339
+#cc2b4f76e050c87b61becc717c1422b5dba28ceb # 233 SVN 247339 Fails/No build error
 #98abd9ff7d04b28d0819e3c9a118e6024f66095c # 237 SVN 247346
 #_commit=2874228166c82e811d1f401255ebbee1f441c87e # 8.0.0.d20170428 has g-exptty.adb xgcc internal error
-# Fails means has g-exptty.adb xgcc internal error
+# Fails means commit has xgcc internal error when building g-exptty.adb
 
 # git+https://gcc.gnu.org/git/gcc.git#branch=${_branch}
 #source=(${_realname}-git::"git://gcc.gnu.org/git/gcc.git#branch=${_branch}"
