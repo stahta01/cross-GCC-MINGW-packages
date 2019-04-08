@@ -13,7 +13,7 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}-git"
          "${MINGW_PACKAGE_PREFIX}-${_realname}-fortran-git"
          "${MINGW_PACKAGE_PREFIX}-${_realname}-ada-git"
          "${MINGW_PACKAGE_PREFIX}-${_realname}-objc-git")
-pkgver=8.0.0.d20170427.c10.ge309c6a600e
+pkgver=8.0.0.d20170427.c10.g3c90e56ea13
 pkgrel=1
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
@@ -45,8 +45,10 @@ options=('staticlibs' '!emptydirs' '!strip' 'debug')
 #_commit=210a347add12c60f9016939b4a9a4e93a3697d73 # SVN 247273  No build error
 #    1fc3fc06ffe561c4773e0872813db4bc3597d72b # 189 SVN 247281
 #    e2d2952e5701217f3410f8754eb050c2c5cf3774 # 192 SVN 247286
-_commit=e309c6a600e5fad060c61ae2d24c4470597abf6d # 201 SVN 247300
-#    3c90e56ea13b6fbb5ec204a9d6bf9a83528d48fe # 206 SVN 247307
+#    375af1938058a2534ff52c5b8fd9f49e80232b00 # 200 SVN 247299
+#_commit=e309c6a600e5fad060c61ae2d24c4470597abf6d # SVN 247300  cannot generate code for file s-excmac.ads
+#    4af1de5b4b45c597d63e935dc3fae6d94b27d39e # 202 SVN 247301
+_commit=3c90e56ea13b6fbb5ec204a9d6bf9a83528d48fe # 206 SVN 247307
 #    4ac44540f557c259edf6de00f5a2df0c0ce109c6 # 208 SVN 247310
 #_commit=1c164d44cc680e9d2b6d1ca6f03adaf59f1bf072 # SVN 247314  Fails
 # Fails means commit has xgcc internal error when building g-exptty.adb
