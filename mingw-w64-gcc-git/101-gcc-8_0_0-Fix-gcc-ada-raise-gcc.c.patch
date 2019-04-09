@@ -1,7 +1,10 @@
 From cc266a6c28f7b78473c15ec46047bb7a9bcf414a Mon Sep 17 00:00:00 2001
 From: Tim S <tim.stahlhut@gmail.com>
 Date: Tue, 9 Apr 2019 08:16:18 -0400
-Subject: [PATCH] Fix gcc/ada/raise-gcc.c
+Subject: Fix gcc/ada/raise-gcc.c
+
+Combined parts of two later patch files SVN 247301 and 247309
+into single patch.
 
 ---
  gcc/ada/gcc-interface/Make-lang.in | 13 ++++++-----
