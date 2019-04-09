@@ -13,7 +13,7 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}-git"
          "${MINGW_PACKAGE_PREFIX}-${_realname}-fortran-git"
          "${MINGW_PACKAGE_PREFIX}-${_realname}-ada-git"
          "${MINGW_PACKAGE_PREFIX}-${_realname}-objc-git")
-pkgver=8.0.0.d20170427.c10.g375af193805
+pkgver=8.0.0.d20170427.c10.g4af1de5b4b4
 pkgrel=1
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
@@ -44,10 +44,12 @@ options=('staticlibs' '!emptydirs' '!strip' 'debug')
 #_branch=master
 
 #_commit=4608a3669c2041a5b69806c9cb8fee9034dc966c # SVN 247295  No build error
+#    dfc5bda9e91ef84b876298dddac5f46c8721efec # SVN 247296
+#    72e2f26860e676198544280b929f7ea3f3e5c010 # SVN 247297
 #    5bcff344383e1499e88044a713cac6a3eaaddb98 # SVN 247298
-_commit=375af1938058a2534ff52c5b8fd9f49e80232b00 # SVN 247299
+#_commit=375af1938058a2534ff52c5b8fd9f49e80232b00 # SVN 247299  cannot generate code for file s-excmac.ads
 #_commit=e309c6a600e5fad060c61ae2d24c4470597abf6d # SVN 247300  cannot generate code for file s-excmac.ads
-#_commit=4af1de5b4b45c597d63e935dc3fae6d94b27d39e # 202 SVN 247301 likely has tconfig.h error
+_commit=4af1de5b4b45c597d63e935dc3fae6d94b27d39e # SVN 247301 likely has tconfig.h error
 #    16b684289b9c6cefd7cbaf5117961cfff94ee528 # SVN 247303
 #    5841ad12783f810c623918c041ebac423b31b5a3 # SVN 247304  likely has tconfig.h error
 #    0d445a83f5afdf5b0ad132d6c56b63079f1a0375 # SVN 247305
@@ -71,7 +73,8 @@ source=(${_realname}-git::"git://gcc.gnu.org/git/gcc.git#commit=${_commit}"
         "0016-gcc-7-branch-disable-weak-refs-in-libstdc++.patch"
         "0017-gcc-7-branch-Enable-std-experimental-filesystem.patch"
         "0018-gcc-7-branch-Enable-a-native-GCC-to-color-diagnostic-messages-sen.patch"
-        "0019-gcc-8-branch-Backport-patches-for-std-filesystem-from-master.patch")
+        "0019-gcc-8-branch-Backport-patches-for-std-filesystem-from-master.patch"
+        101-gcc-8_0_0-Fix-gcc-ada-raise-gcc.c.patch)
 sha256sums=('SKIP'
             '83e9c6f76f728ae3e2f2eabb588b0d6cea7a3eda03cd5e77aed9d613143b7348'
             '6033acda690786397059536787a6577e1a9f2b39f8a66276821917066094f43c'
@@ -86,7 +89,8 @@ sha256sums=('SKIP'
             'c1e271c166de0062092cb61d50977c0e61d75b0ae6fb086cb8bb4da2b3fd18d7'
             'b1c3c20bf501cebbcb02b4a50f117a4f90eb4fb79eac7aa99c85e2c54c106790'
             '33392651e17b81609718873ff32606deee5f3fc5176c197bb96eedc3dada8912'
-            'bf83cbc79de4c86f02664c8a624e26b12f570e3c31116fc7c46ecf655696f9a6')
+            'bf83cbc79de4c86f02664c8a624e26b12f570e3c31116fc7c46ecf655696f9a6'
+            '7767cbd0ddfb3a41ec5de73047a7cfcd72b951f040b3e65daad6ec4cc172a3be')
 
 _threads="posix"
 
@@ -121,6 +125,8 @@ prepare() {
   if [ "${_branch}" == "gcc-8-branch" ]; then
     ${GIT_AM} ${srcdir}/0019-gcc-8-branch-Backport-patches-for-std-filesystem-from-master.patch
   fi
+
+#  ${GIT_AM} ${srcdir}/101-gcc-8_0_0-Fix-gcc-ada-raise-gcc.c.patch
 
   # do not expect $prefix/mingw symlink - this should be superceded by
   # 0004-Windows-Don-t-ignore-native-system-header-dir.patch .. but isn't!
