@@ -13,7 +13,7 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}-git"
          "${MINGW_PACKAGE_PREFIX}-${_realname}-fortran-git"
          "${MINGW_PACKAGE_PREFIX}-${_realname}-ada-git"
          "${MINGW_PACKAGE_PREFIX}-${_realname}-objc-git")
-pkgver=8.0.0.d20170427.c10.g4af1de5b4b4
+pkgver=8.0.0.d20170427.c11.g4af1de5b4b4
 pkgrel=1
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
@@ -90,7 +90,7 @@ sha256sums=('SKIP'
             'b1c3c20bf501cebbcb02b4a50f117a4f90eb4fb79eac7aa99c85e2c54c106790'
             '33392651e17b81609718873ff32606deee5f3fc5176c197bb96eedc3dada8912'
             'bf83cbc79de4c86f02664c8a624e26b12f570e3c31116fc7c46ecf655696f9a6'
-            '7767cbd0ddfb3a41ec5de73047a7cfcd72b951f040b3e65daad6ec4cc172a3be')
+            '80ca2af7172ac6787e0590b43c4cf9b616f0a22459e8277b1ade07ff75a54a8f')
 
 _threads="posix"
 
@@ -126,7 +126,7 @@ prepare() {
     ${GIT_AM} ${srcdir}/0019-gcc-8-branch-Backport-patches-for-std-filesystem-from-master.patch
   fi
 
-#  ${GIT_AM} ${srcdir}/101-gcc-8_0_0-Fix-gcc-ada-raise-gcc.c.patch
+  ${GIT_AM} ${srcdir}/101-gcc-8_0_0-Fix-gcc-ada-raise-gcc.c.patch
 
   # do not expect $prefix/mingw symlink - this should be superceded by
   # 0004-Windows-Don-t-ignore-native-system-header-dir.patch .. but isn't!
