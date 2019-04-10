@@ -3,6 +3,8 @@ From: Tim S <tim.stahlhut@gmail.com>
 Date: Tue, 9 Apr 2019 19:57:53 -0400
 Subject: [PATCH 2/2] Edit Make-lang.in second time
 
+Part of SVN 247339
+
 ---
  gcc/ada/gcc-interface/Make-lang.in | 13 +++++++------
  1 file changed, 7 insertions(+), 6 deletions(-)
