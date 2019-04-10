@@ -1,0 +1,3207 @@
+From 1f689b5f9f9717f67798faeaf0d7b6bbe010dbf8 Mon Sep 17 00:00:00 2001
+From: charlet <charlet@138bc75d-0d04-0410-961f-82ee72b054a4>
+Date: Thu, 27 Apr 2017 09:48:45 +0000
+Subject: [PATCH 1/5] 2017-04-27 Claire Dross <dross@adacore.com>
+
+	* a-cfdlli.adb, a-cfdlli.ads (Formal_Model): Adapt to
+	modifications in functional containers.
+	* a-cofuba.ads, a-cofuma.ads, a-cofuse.ads, a-cofuve.ads Reformat
+	to improve readablity. Subprograms are separated between basic
+	operations, constructors and properties. Universally quantified
+	formulas in contracts are factorized in independant functions
+	with a name and a comment.  Names of parameters are improved.
+---
+ gcc/ada/a-cfdlli.adb | 181 ++++--------
+ gcc/ada/a-cfdlli.ads | 640 ++++++++++++++++++++-----------------------
+ gcc/ada/a-cofuma.adb | 216 ++++++++++-----
+ gcc/ada/a-cofuma.ads | 243 ++++++++++------
+ gcc/ada/a-cofuse.adb | 110 ++++----
+ gcc/ada/a-cofuse.ads | 214 +++++++++------
+ gcc/ada/a-cofuve.adb | 246 +++++++++++------
+ gcc/ada/a-cofuve.ads | 346 +++++++++++++++--------
+ 8 files changed, 1250 insertions(+), 946 deletions(-)
+
+diff --git a/gcc/ada/a-cfdlli.adb b/gcc/ada/a-cfdlli.adb
+index 52bdc18ea55..d799dccb3fe 100644
+--- a/gcc/ada/a-cfdlli.adb
++++ b/gcc/ada/a-cfdlli.adb
+@@ -496,73 +496,19 @@ is
+ 
+       procedure Lift_Abstraction_Level (Container : List) is null;
+ 
+-      -------------------------
+-      -- M_Elements_Contains --
+-      -------------------------
+-
+-      function M_Elements_Contains
+-        (S   : M.Sequence;
+-         Fst : Positive_Count_Type;
+-         Lst : Count_Type;
+-         E   : Element_Type)
+-         return Boolean
+-      is
+-      begin
+-         for I in Fst .. Lst loop
+-            if Element (S, I) = E then
+-               return True;
+-            end if;
+-         end loop;
+-         return False;
+-      end M_Elements_Contains;
+-
+-      --------------------
+-      -- M_Elements_Cst --
+-      --------------------
+-
+-      function M_Elements_Cst
+-        (S   : M.Sequence;
+-         Fst : Positive_Count_Type;
+-         Lst : Count_Type;
+-         E   : Element_Type)
+-         return Boolean
+-      is
+-      begin
+-         for I in Fst .. Lst loop
+-            if Element (S, I) /= E then
+-               return False;
+-            end if;
+-         end loop;
+-         return True;
+-      end M_Elements_Cst;
+-
+-      ----------------------
+-      -- M_Elements_Equal --
+-      ----------------------
+-
+-      function M_Elements_Equal
+-        (S1, S2   : M.Sequence;
+-         Fst      : Positive_Count_Type;
+-         Lst      : Count_Type)
+-         return Boolean
+-      is
+-      begin
+-         return M_Elements_Shifted (S1, S2, Fst, Lst, 0);
+-      end M_Elements_Equal;
+-
+       -------------------------
+       -- M_Elements_Reversed --
+       -------------------------
+ 
+-      function M_Elements_Reversed (S1, S2 : M.Sequence) return Boolean is
+-         L : constant Count_Type := M.Length (S1);
++      function M_Elements_Reversed (Left, Right : M.Sequence) return Boolean is
++         L : constant Count_Type := M.Length (Left);
+       begin
+-         if L /= M.Length (S2) then
++         if L /= M.Length (Right) then
+             return False;
+          end if;
+ 
+          for I in 1 .. L loop
+-            if Element (S1, I) /= Element (S2, L - I + 1)
++            if Element (Left, I) /= Element (Right, L - I + 1)
+             then
+                return False;
+             end if;
+@@ -571,36 +517,16 @@ is
+          return True;
+       end M_Elements_Reversed;
+ 
+-      ------------------------
+-      -- M_Elements_Shifted --
+-      ------------------------
+-
+-      function M_Elements_Shifted
+-        (S1, S2   : M.Sequence;
+-         Fst      : Positive_Count_Type;
+-         Lst      : Count_Type;
+-         Offset   : Count_Type'Base := 1)
+-         return Boolean
+-      is
+-      begin
+-         for I in Fst .. Lst loop
+-            if Element (S1, I) /= Element (S2, I + Offset) then
+-               return False;
+-            end if;
+-         end loop;
+-         return True;
+-      end M_Elements_Shifted;
+-
+       -------------------------
+       -- M_Elements_Shuffled --
+       -------------------------
+ 
+       function M_Elements_Shuffle
+-        (S1, S2   : M.Sequence;
+-         Fst      : Positive_Count_Type;
+-         Lst      : Count_Type;
+-         Offset   : Count_Type'Base)
+-         return Boolean
++        (Left   : M.Sequence;
++         Right  : M.Sequence;
++         Fst    : Positive_Count_Type;
++         Lst    : Count_Type;
++         Offset : Count_Type'Base) return Boolean
+       is
+       begin
+          for I in Fst .. Lst loop
+@@ -609,7 +535,7 @@ is
+                J     : Count_Type := Fst;
+             begin
+                while not Found and J <= Lst loop
+-                  if Element (S1, I) = Element (S2, J + Offset) then
++                  if Element (Left, I) = Element (Right, J + Offset) then
+                      Found := True;
+                   end if;
+                   J := J + 1;
+@@ -628,21 +554,21 @@ is
+       ------------------------
+ 
+       function M_Elements_Swapped
+-        (S1, S2 : M.Sequence;
+-         X, Y   : Positive_Count_Type)
+-      return Boolean
++        (Left  : M.Sequence;
++         Right : M.Sequence;
++         X, Y  : Positive_Count_Type) return Boolean
+       is
+       begin
+-         if M.Length (S1) /= M.Length (S2)
+-           or else Element (S1, X) /= Element (S2, Y)
+-           or else Element (S1, Y) /= Element (S2, X)
++         if M.Length (Left) /= M.Length (Right)
++           or else Element (Left, X) /= Element (Right, Y)
++           or else Element (Left, Y) /= Element (Right, X)
+          then
+             return False;
+          end if;
+ 
+-         for I in 1 .. M.Length (S1) loop
++         for I in 1 .. M.Length (Left) loop
+             if I /= X and then I /= Y
+-              and then Element (S1, I) /= Element (S2, I)
++              and then Element (Left, I) /= Element (Right, I)
+             then
+                return False;
+             end if;
+@@ -673,22 +599,25 @@ is
+       -----------------------
+ 
+       function Mapping_Preserved
+-        (S1, S2 : M.Sequence;
+-         M1, M2 : P.Map) return Boolean is
+-
++        (M_Left  : M.Sequence;
++         M_Right : M.Sequence;
++         P_Left  : P.Map;
++         P_Right : P.Map) return Boolean
++      is
+       begin
+-         for C of M1 loop
+-            if not P.Mem (M2, C)
+-              or else P.Get (M1, C) > M.Length (S1)
+-              or else P.Get (M2, C) > M.Length (S2)
+-              or else M.Get (S1, P.Get (M1, C)) /= M.Get (S2, P.Get (M2, C))
++         for C of P_Left loop
++            if not P.Has_Key (P_Right, C)
++              or else P.Get (P_Left, C) > M.Length (M_Left)
++              or else P.Get (P_Right, C) > M.Length (M_Right)
++              or else M.Get (M_Left, P.Get (P_Left, C))
++                   /= M.Get (M_Right, P.Get (P_Right, C))
+             then
+                return False;
+             end if;
+          end loop;
+ 
+-         for C of M2 loop
+-            if not P.Mem (M1, C) then
++         for C of P_Right loop
++            if not P.Has_Key (P_Left, C) then
+                return False;
+             end if;
+          end loop;
+@@ -708,7 +637,7 @@ is
+       is
+       begin
+          for Cu of Small loop
+-            if not P.Mem (Big, Cu) then
++            if not P.Has_Key (Big, Cu) then
+                return False;
+             end if;
+          end loop;
+@@ -718,18 +647,18 @@ is
+                Pos : constant Positive_Count_Type := P.Get (Big, Cu);
+             begin
+                if Pos < Cut then
+-                  if not P.Mem (Small, Cu) or else Pos /= P.Get (Small, Cu)
++                  if not P.Has_Key (Small, Cu) or else Pos /= P.Get (Small, Cu)
+                   then
+                      return False;
+                   end if;
+                elsif Pos >= Cut + Count then
+-                  if not P.Mem (Small, Cu)
++                  if not P.Has_Key (Small, Cu)
+                     or else Pos /= P.Get (Small, Cu) + Count
+                   then
+                      return False;
+                   end if;
+                else
+-                  if P.Mem (Small, Cu) then
++                  if P.Has_Key (Small, Cu) then
+                      return False;
+                   end if;
+                end if;
+@@ -743,31 +672,33 @@ is
+       -------------------------
+ 
+       function P_Positions_Swapped
+-        (M1, M2 : P.Map;
+-         C1, C2 : Cursor) return Boolean
++        (Left  : P.Map;
++         Right : P.Map;
++         X, Y  : Cursor) return Boolean
+       is
+       begin
+-         if not P.Mem (M1, C1) or not P.Mem (M1, C2)
+-           or not P.Mem (M2, C1) or not P.Mem (M2, C2)
++         if not P.Has_Key (Left, X) or not P.Has_Key (Left, Y)
++           or not P.Has_Key (Right, X) or not P.Has_Key (Right, Y)
+          then
+             return False;
+          end if;
+ 
+-         if P.Get (M1, C1) /= P.Get (M2, C2)
+-             or P.Get (M1, C2) /= P.Get (M2, C1)
++         if P.Get (Left, X) /= P.Get (Right, Y)
++             or P.Get (Left, Y) /= P.Get (Right, X)
+          then
+             return False;
+          end if;
+ 
+-         for C of M1 loop
+-            if not P.Mem (M2, C) then
++         for C of Left loop
++            if not P.Has_Key (Right, C) then
+                return False;
+             end if;
+          end loop;
+ 
+-         for C of M2 loop
+-            if not P.Mem (M1, C)
+-              or else (C /= C1 and C /= C2 and P.Get (M1, C) /= P.Get (M2, C))
++         for C of Right loop
++            if not P.Has_Key (Left, C)
++              or else (C /= X and C /= Y
++                       and P.Get (Left, C) /= P.Get (Right, C))
+             then
+                return False;
+             end if;
+@@ -788,7 +719,7 @@ is
+       is
+       begin
+          for Cu of Small loop
+-            if not P.Mem (Big, Cu) then
++            if not P.Has_Key (Big, Cu) then
+                return False;
+             end if;
+          end loop;
+@@ -798,13 +729,13 @@ is
+                Pos : constant Positive_Count_Type := P.Get (Big, Cu);
+             begin
+                if Pos < Cut then
+-                  if not P.Mem (Small, Cu) or else Pos /= P.Get (Small, Cu)
++                  if not P.Has_Key (Small, Cu) or else Pos /= P.Get (Small, Cu)
+                   then
+                      return False;
+                   end if;
+                elsif Pos >= Cut + Count then
+                   return False;
+-               elsif P.Mem (Small, Cu) then
++               elsif P.Has_Key (Small, Cu) then
+                   return False;
+                end if;
+             end;
+@@ -907,18 +838,18 @@ is
+       -- M_Elements_Sorted --
+       -----------------------
+ 
+-      function M_Elements_Sorted (S : M.Sequence) return Boolean is
++      function M_Elements_Sorted (Container : M.Sequence) return Boolean is
+       begin
+-         if M.Length (S) = 0 then
++         if M.Length (Container) = 0 then
+             return True;
+          end if;
+ 
+          declare
+-            E1 : Element_Type := Element (S, 1);
++            E1 : Element_Type := Element (Container, 1);
+          begin
+-            for I in 2 .. M.Length (S) loop
++            for I in 2 .. M.Length (Container) loop
+                declare
+-                  E2 : constant Element_Type := Element (S, I);
++                  E2 : constant Element_Type := Element (Container, I);
+                begin
+                   if E2 < E1 then
+                      return False;
+diff --git a/gcc/ada/a-cfdlli.ads b/gcc/ada/a-cfdlli.ads
+index 62cdf52028e..0fce67383e0 100644
+--- a/gcc/ada/a-cfdlli.ads
++++ b/gcc/ada/a-cfdlli.ads
+@@ -71,120 +71,59 @@ is
+       function "<" (Left, Right : M.Sequence) return Boolean renames M."<";
+       function "<=" (Left, Right : M.Sequence) return Boolean renames M."<=";
+ 
+-      function M_Elements_Contains
+-        (S   : M.Sequence;
+-         Fst : Positive_Count_Type;
+-         Lst : Count_Type;
+-         E   : Element_Type)
+-      return Boolean
+-      --  E appears in the slice from Fst to Lst in S
+-      with
+-        Global => null,
+-        Pre    => Lst <= M.Length (S),
+-        Post   =>
+-          M_Elements_Contains'Result =
+-            (for some I in Fst .. Lst => Element (S, I) = E);
+-      pragma Annotate (GNATprove, Inline_For_Proof, M_Elements_Contains);
+-
+-      function M_Elements_Cst
+-        (S   : M.Sequence;
+-         Fst : Positive_Count_Type;
+-         Lst : Count_Type;
+-         E   : Element_Type)
+-      return Boolean
+-      --  Every element of the slice from Fst to Lst in S is E.
+-      with
+-        Global => null,
+-        Pre    => Lst <= M.Length (S),
+-        Post   =>
+-          M_Elements_Cst'Result =
+-            (for all I in Fst .. Lst => Element (S, I) = E);
+-      pragma Annotate (GNATprove, Inline_For_Proof, M_Elements_Cst);
+-
+-      function M_Elements_Equal
+-        (S1, S2 : M.Sequence;
+-         Fst    : Positive_Count_Type;
+-         Lst    : Count_Type)
+-      return Boolean
+-      --  The slice from Fst to Lst is the same in S1 and S2
+-      with
+-        Global => null,
+-        Pre    => Lst <= M.Length (S1) and Lst <= M.Length (S2),
+-        Post   =>
+-          M_Elements_Equal'Result =
+-            (for all I in Fst .. Lst => Element (S1, I) = Element (S2, I));
+-      pragma Annotate (GNATprove, Inline_For_Proof, M_Elements_Equal);
+-
+       function M_Elements_Shuffle
+-        (S1, S2 : M.Sequence;
++        (Left   : M.Sequence;
++         Right  : M.Sequence;
+          Fst    : Positive_Count_Type;
+          Lst    : Count_Type;
+          Offset : Count_Type'Base)
+       return Boolean
+-      --  The slice from Fst to Lst in S1 contains the same elements than the
+-      --  same slide shifted by Offset in S2
++      --  The slice from Fst to Lst in Left contains the same elements than the
++      --  same slide shifted by Offset in Right
+       with
+         Global => null,
+         Pre    =>
+-          Lst <= M.Length (S1)
+-            and Offset in 1 - Fst .. M.Length (S2) - Lst,
++          Lst <= M.Length (Left)
++            and Offset in 1 - Fst .. M.Length (Right) - Lst,
+         Post   =>
+           M_Elements_Shuffle'Result =
+           (for all J in Fst + Offset .. Lst + Offset =>
+              (for some I in Fst .. Lst =>
+-                    Element (S1, I) = Element (S2, J)));
++                    Element (Left, I) = Element (Right, J)));
+       pragma Annotate (GNATprove, Inline_For_Proof, M_Elements_Shuffle);
+ 
+-      function M_Elements_Reversed (S1, S2 : M.Sequence) return Boolean
+-      --  S2 is S1 in reverse order
++      function M_Elements_Reversed (Left, Right : M.Sequence) return Boolean
++      --  Right is Left in reverse order
+       with
+         Global => null,
+         Post   =>
+           M_Elements_Reversed'Result =
+-              (M.Length (S1) = M.Length (S2)
+-               and (for all I in 1 .. M.Length (S1) =>
+-                   Element (S1, I) = Element (S2, M.Length (S1) - I + 1))
+-               and (for all I in 1 .. M.Length (S1) =>
+-                   Element (S2, I) = Element (S1, M.Length (S1) - I + 1)));
++              (M.Length (Left) = M.Length (Right)
++               and
++                 (for all I in 1 .. M.Length (Left) =>
++                      Element (Left, I)
++                    = Element (Right, M.Length (Left) - I + 1))
++               and
++                 (for all I in 1 .. M.Length (Left) =>
++                      Element (Right, I)
++                    = Element (Left, M.Length (Left) - I + 1)));
+       pragma Annotate (GNATprove, Inline_For_Proof, M_Elements_Reversed);
+ 
+-      function M_Elements_Shifted
+-        (S1, S2   : M.Sequence;
+-         Fst      : Positive_Count_Type;
+-         Lst      : Count_Type;
+-         Offset   : Count_Type'Base := 1)
+-      return Boolean
+-      --  The slice from Fst to Lst in S1 has been shifted by Offset in S2.
+-      with
+-          Global => null,
+-        Pre    =>
+-          Lst <= M.Length (S1)
+-            and Offset in 1 - Fst .. M.Length (S2) - Lst,
+-        Post   =>
+-          M_Elements_Shifted'Result =
+-            ((for all I in Fst .. Lst =>
+-                      Element (S1, I) = Element (S2, I + Offset))
+-             and (for all I in Fst + Offset .. Lst + Offset =>
+-                          Element (S1, I - Offset) = Element (S2, I)));
+-      pragma Annotate (GNATprove, Inline_For_Proof, M_Elements_Shifted);
+-
+       function M_Elements_Swapped
+-        (S1, S2 : M.Sequence;
+-         X, Y   : Positive_Count_Type)
++        (Left  : M.Sequence;
++         Right : M.Sequence;
++         X, Y  : Positive_Count_Type)
+       return Boolean
+-      --  Elements stored at X and Y are reversed in S1 and S2
++      --  Elements stored at X and Y are reversed in Left and Right
+       with
+         Global => null,
+-        Pre    => X <= M.Length (S1) and Y <= M.Length (S1),
++        Pre    => X <= M.Length (Left) and Y <= M.Length (Left),
+         Post   =>
+           M_Elements_Swapped'Result =
+-            (M.Length (S1) = M.Length (S2)
+-             and Element (S1, X) = Element (S2, Y)
+-             and Element (S1, Y) = Element (S2, X)
+-             and
+-               (for all I in 1 .. M.Length (S1) =>
+-                 (if I /= X and I /= Y
+-                    then Element (S1, I) = Element (S2, I))));
++            (M.Length (Left) = M.Length (Right)
++             and Element (Left, X) = Element (Right, Y)
++             and Element (Left, Y) = Element (Right, X)
++             and M.Equal_Except (Left, Right, X, Y));
+       pragma Annotate (GNATprove, Inline_For_Proof, M_Elements_Swapped);
+ 
+       package P is new Ada.Containers.Functional_Maps
+@@ -205,7 +144,7 @@ is
+           P_Positions_Shifted'Result =
+ 
+          --  Big contains all cursors of Small
+-        ((for all I of Small => P.Mem (Big, I))
++        (P.Keys_Included (Small, Big)
+ 
+          --  Cursors located before Cut are not moved, cursors located after
+          --  are shifted by Count.
+@@ -218,28 +157,25 @@ is
+          --  New cursors of Big (if any) are between Cut and Cut - 1 + Count
+          and
+            (for all I of Big =>
+-                 P.Mem (Small, I)
++                 P.Has_Key (Small, I)
+               or P.Get (Big, I) - Count in Cut - Count  .. Cut - 1));
+ 
+       function P_Positions_Swapped
+-        (M1, M2 : P.Map;
+-         C1, C2 : Cursor) return Boolean
+-      --  M1 and M2 contain the same cursors, but the positions of C1 and C2
++        (Left  : P.Map;
++         Right : P.Map;
++         X, Y  : Cursor) return Boolean
++      --  Left and Right contain the same cursors, but the positions of X and Y
+       --  are reversed.
+       with
+         Ghost,
+         Global => null,
+         Post   =>
+           P_Positions_Swapped'Result =
+-              ((for all C of M1 => P.Mem (M2, C))
+-               and (for all C of M2 => P.Mem (M1, C))
+-               and
+-                 (for all C of M1 =>
+-                    (if C /= C1 and C /= C2
+-                     then P.Get (M1, C) = P.Get (M2, C)))
+-               and P.Mem (M1, C1) and P.Mem (M1, C2)
+-               and P.Get (M1, C1) = P.Get (M2, C2)
+-               and P.Get (M1, C2) = P.Get (M2, C1));
++              (P.Same_Keys (Left, Right)
++               and P.Elements_Equal_Except (Left, Right, X, Y)
++               and P.Has_Key (Left, X) and P.Has_Key (Left, Y)
++               and P.Get (Left, X) = P.Get (Right, Y)
++               and P.Get (Left, Y) = P.Get (Right, X));
+ 
+       function P_Positions_Truncated
+         (Small : P.Map;
+@@ -252,40 +188,34 @@ is
+         Post   =>
+           P_Positions_Truncated'Result =
+ 
+-         --  Big contains all cursors of Small
+-        ((for all I of Small => P.Mem (Big, I))
+-
+-         --  The cursors of Small are all bellow Cut
+-         and (for all I of Small => P.Get (Small, I) < Cut)
+-
+-         --  The cursors have the same position in Big and Small
+-         and (for all I of Small => P.Get (Big, I) = P.Get (Small, I))
++         --  Big contains all cursors of Small at the same position
++        (Small <= Big
+ 
+          --  New cursors of Big (if any) are between Cut and Cut - 1 + Count
+          and
+            (for all I of Big =>
+-                P.Mem (Small, I)
++                P.Has_Key (Small, I)
+              or P.Get (Big, I) - Count in Cut - Count .. Cut - 1));
+ 
+       function Mapping_Preserved
+-        (S1, S2 : M.Sequence;
+-         M1, M2 : P.Map) return Boolean
++        (M_Left  : M.Sequence;
++         M_Right : M.Sequence;
++         P_Left  : P.Map;
++         P_Right : P.Map) return Boolean
+       with
+         Ghost,
+         Global => null,
+         Post   =>
+             (if Mapping_Preserved'Result then
+ 
+-            --  M1 contains all cursors of M2
+-            (for all I of M2 => P.Mem (M1, I))
+-
+-            --  M2 contains all cursors of M1
+-            and (for all I of M1 => P.Mem (M2, I))
++             --  Left and Right contain the same cursors
++             P.Same_Keys (P_Left, P_Right)
+ 
+-            --  Mappings from cursors to elements induced by S1, M1 and S2, M2
+-            --  are the same.
+-            and (for all I of M1 =>
+-                       M.Get (S1, P.Get (M1, I)) = M.Get (S2, P.Get (M2, I))));
++             --  Mappings from cursors to elements induced by M_Left, P_Left
++             --  and M_Right, P_Right are the same.
++             and (for all C of P_Left =>
++                          M.Get (M_Left, P.Get (P_Left, C))
++                        = M.Get (M_Right, P.Get (P_Right, C))));
+ 
+       function Model (Container : List) return M.Sequence with
+       --  The highlevel model of a list is a sequence of elements. Cursors are
+@@ -302,7 +232,7 @@ is
+ 
+         Ghost,
+         Global => null,
+-        Post   => not P.Mem (Positions'Result, No_Element)
++        Post   => not P.Has_Key (Positions'Result, No_Element)
+         --  Positions of cursors are smaller than the container's length.
+         and then
+           (for all I of Positions'Result =>
+@@ -388,12 +318,14 @@ is
+      --  Cursors are preserved.
+      and Positions (Container)'Old = Positions (Container)
+ 
+-     --  The element at the position of Position in Container is replaced by
+-     --  New_Item.
+-     and M.Is_Set (Model (Container)'Old,
+-                   P.Get (Positions (Container), Position),
+-                   New_Item,
+-                   Model (Container));
++     --  The element at the position of Position in Container is New_Item
++     and Element (Model (Container), P.Get (Positions (Container), Position))
++       = New_Item
++
++     --  Other elements are preserved
++     and M.Equal_Except (Model (Container)'Old,
++                         Model (Container),
++                         P.Get (Positions (Container), Position));
+ 
+    procedure Move (Target : in out List; Source : in out List) with
+      Global => null,
+@@ -417,25 +349,35 @@ is
+ 
+           --  Positions contains a new mapping from the last cursor of
+           --  Container to its length.
+-          P.Is_Add
+-            (Positions (Container)'Old, Last (Container), Length (Container),
+-             Result => Positions (Container))
++          P.Get (Positions (Container), Last (Container)) = Length (Container)
++
++          --  Other cursors come from Container'Old
++          and P.Keys_Included_Except
++            (Left    => Positions (Container),
++             Right   => Positions (Container)'Old,
++             New_Key => Last (Container))
++
++          --  Cursors of Container'Old keep the same position
++          and Positions (Container)'Old <= Positions (Container)
+ 
+           --  Model contains a new element New_Item at the end
+-          and M.Is_Add (Model (Container)'Old, New_Item, Model (Container)),
++          and Element (Model (Container), Length (Container)) = New_Item
++
++          --  Elements of Container'Old are preserved
++          and Model (Container)'Old <= Model (Container),
+         others              =>
+ 
+           --  The elements of Container located before Before are preserved.
+-          M_Elements_Equal
+-            (S1  => Model (Container)'Old,
+-             S2  => Model (Container),
+-             Fst => 1,
+-             Lst => P.Get (Positions (Container)'Old, Before) - 1)
++          M.Range_Equal
++            (Left  => Model (Container)'Old,
++             Right => Model (Container),
++             Fst   => 1,
++             Lst   => P.Get (Positions (Container)'Old, Before) - 1)
+ 
+           --  Other elements are shifted by 1.
+-          and M_Elements_Shifted
+-            (S1     => Model (Container)'Old,
+-             S2     => Model (Container),
++          and M.Range_Shifted
++            (Left   => Model (Container)'Old,
++             Right  => Model (Container),
+              Fst    => P.Get (Positions (Container)'Old, Before),
+              Lst    => Length (Container)'Old,
+              Offset => 1)
+@@ -468,18 +410,18 @@ is
+        (Before = No_Element =>
+ 
+           --  The elements of Container are preserved
+-          M_Elements_Equal
+-            (S1  => Model (Container)'Old,
+-             S2  => Model (Container),
+-             Fst => 1,
+-             Lst => Length (Container)'Old)
++          M.Range_Equal
++            (Left  => Model (Container)'Old,
++             Right => Model (Container),
++             Fst   => 1,
++             Lst   => Length (Container)'Old)
+ 
+           --  Container contains Count times New_Item at the end
+-          and M_Elements_Cst
+-            (S   => Model (Container),
+-             Fst => Length (Container)'Old + 1,
+-             Lst => Length (Container),
+-             E   => New_Item)
++          and M.Constant_Range
++            (Container => Model (Container),
++             Fst       => Length (Container)'Old + 1,
++             Lst       => Length (Container),
++             Item      => New_Item)
+ 
+           --  A Count cursors have been inserted at the end of Container
+           and P_Positions_Truncated
+@@ -490,26 +432,27 @@ is
+         others              =>
+ 
+           --  The elements of Container located before Before are preserved
+-          M_Elements_Equal
+-            (S1  => Model (Container)'Old,
+-             S2  => Model (Container),
+-             Fst => 1,
+-             Lst => P.Get (Positions (Container)'Old, Before) - 1)
++          M.Range_Equal
++            (Left  => Model (Container)'Old,
++             Right => Model (Container),
++             Fst   => 1,
++             Lst   => P.Get (Positions (Container)'Old, Before) - 1)
+ 
+           --  Other elements are shifted by Count.
+-          and M_Elements_Shifted
+-            (S1     => Model (Container)'Old,
+-             S2     => Model (Container),
++          and M.Range_Shifted
++            (Left   => Model (Container)'Old,
++             Right  => Model (Container),
+              Fst    => P.Get (Positions (Container)'Old, Before),
+              Lst    => Length (Container)'Old,
+              Offset => Count)
+ 
+           --  Container contains Count times New_Item after position Before
+-          and M_Elements_Cst
+-            (S   => Model (Container),
+-             Fst => P.Get (Positions (Container)'Old, Before),
+-             Lst => P.Get (Positions (Container)'Old, Before) - 1 + Count,
+-             E   => New_Item)
++          and M.Constant_Range
++            (Container => Model (Container),
++             Fst       => P.Get (Positions (Container)'Old, Before),
++             Lst       =>
++               P.Get (Positions (Container)'Old, Before) - 1 + Count,
++             Item      => New_Item)
+ 
+           --  Count cursors have been inserted at position Before in Container
+           and P_Positions_Shifted
+@@ -535,7 +478,7 @@ is
+           --  Positions is valid in Container and it is located either before
+           --  Before if it is valid in Container or at the end if it is
+           --  No_Element.
+-          and P.Mem (Positions (Container), Position)
++          and P.Has_Key (Positions (Container), Position)
+           and (if Before = No_Element
+                then P.Get (Positions (Container), Position)
+                   = Length (Container)
+@@ -543,16 +486,16 @@ is
+                   = P.Get (Positions (Container)'Old, Before))
+ 
+           --  The elements of Container located before Position are preserved.
+-          and M_Elements_Equal
+-            (S1  => Model (Container)'Old,
+-             S2  => Model (Container),
+-             Fst => 1,
+-             Lst => P.Get (Positions (Container), Position) - 1)
++          and M.Range_Equal
++            (Left  => Model (Container)'Old,
++             Right => Model (Container),
++             Fst   => 1,
++             Lst   => P.Get (Positions (Container), Position) - 1)
+ 
+           --  Other elements are shifted by 1.
+-          and M_Elements_Shifted
+-            (S1     => Model (Container)'Old,
+-             S2     => Model (Container),
++          and M.Range_Shifted
++            (Left   => Model (Container)'Old,
++             Right  => Model (Container),
+              Fst    => P.Get (Positions (Container), Position),
+              Lst    => Length (Container)'Old,
+              Offset => 1)
+@@ -590,7 +533,7 @@ is
+           --  Positions is valid in Container and it is located either before
+           --  Before if it is valid in Container or at the end if it is
+           --  No_Element.
+-          P.Mem (Positions (Container), Position)
++          P.Has_Key (Positions (Container), Position)
+           and (if Before = No_Element
+                then P.Get (Positions (Container), Position)
+                   = Length (Container)'Old + 1
+@@ -598,26 +541,26 @@ is
+                   = P.Get (Positions (Container)'Old, Before))
+ 
+           --  The elements of Container located before Position are preserved.
+-          and M_Elements_Equal
+-            (S1  => Model (Container)'Old,
+-             S2  => Model (Container),
+-             Fst => 1,
+-             Lst => P.Get (Positions (Container), Position) - 1)
++          and M.Range_Equal
++            (Left  => Model (Container)'Old,
++             Right => Model (Container),
++             Fst   => 1,
++             Lst   => P.Get (Positions (Container), Position) - 1)
+ 
+           --  Other elements are shifted by Count.
+-          and M_Elements_Shifted
+-            (S1     => Model (Container)'Old,
+-             S2     => Model (Container),
++          and M.Range_Shifted
++            (Left   => Model (Container)'Old,
++             Right  => Model (Container),
+              Fst    => P.Get (Positions (Container), Position),
+              Lst    => Length (Container)'Old,
+              Offset => Count)
+ 
+           --  Container contains Count times New_Item after position Position
+-          and M_Elements_Cst
+-            (S   => Model (Container),
+-             Fst => P.Get (Positions (Container), Position),
+-             Lst => P.Get (Positions (Container), Position) - 1 + Count,
+-             E   => New_Item)
++          and M.Constant_Range
++            (Container => Model (Container),
++             Fst       => P.Get (Positions (Container), Position),
++             Lst       => P.Get (Positions (Container), Position) - 1 + Count,
++             Item      => New_Item)
+ 
+           --  Count cursor have been inserted at Position in Container
+           and P_Positions_Shifted
+@@ -636,9 +579,9 @@ is
+        Length (Container) = Length (Container)'Old + 1
+ 
+           --  Elements are shifted by 1
+-          and M_Elements_Shifted
+-            (S1     => Model (Container)'Old,
+-             S2     => Model (Container),
++          and M.Range_Shifted
++            (Left   => Model (Container)'Old,
++             Right  => Model (Container),
+              Fst    => 1,
+              Lst    => Length (Container)'Old,
+              Offset => 1)
+@@ -663,19 +606,19 @@ is
+        Length (Container) = Length (Container)'Old + Count
+ 
+           --  Elements are shifted by Count.
+-          and M_Elements_Shifted
+-            (S1     => Model (Container)'Old,
+-             S2     => Model (Container),
++          and M.Range_Shifted
++            (Left     => Model (Container)'Old,
++             Right     => Model (Container),
+              Fst    => 1,
+              Lst    => Length (Container)'Old,
+              Offset => Count)
+ 
+           --  Container starts with Count times New_Item
+-          and M_Elements_Cst
+-            (S   => Model (Container),
+-             Fst => 1,
+-             Lst => Count,
+-             E   => New_Item)
++          and M.Constant_Range
++            (Container => Model (Container),
++             Fst       => 1,
++             Lst       => Count,
++             Item      => New_Item)
+ 
+           --  Count cursors have been inserted at the beginning of Container
+           and P_Positions_Shifted
+@@ -694,12 +637,23 @@ is
+ 
+           --  Positions contains a new mapping from the last cursor of
+           --  Container to its length.
+-          and P.Is_Add
+-            (Positions (Container)'Old, Last (Container), Length (Container),
+-             Result => Positions (Container))
++          and P.Get (Positions (Container), Last (Container))
++            = Length (Container)
++
++          --  Other cursors come from Container'Old
++          and P.Keys_Included_Except
++            (Left    => Positions (Container),
++             Right   => Positions (Container)'Old,
++             New_Key => Last (Container))
++
++          --  Cursors of Container'Old keep the same position
++          and Positions (Container)'Old <= Positions (Container)
+ 
+           --  Model contains a new element New_Item at the end
+-          and M.Is_Add (Model (Container)'Old, New_Item, Model (Container));
++          and Element (Model (Container), Length (Container)) = New_Item
++
++          --  Elements of Container'Old are preserved
++          and Model (Container)'Old <= Model (Container);
+ 
+    procedure Append
+      (Container : in out List;
+@@ -715,11 +669,11 @@ is
+           and Model (Container)'Old <= Model (Container)
+ 
+           --  Container contains Count times New_Item at the end
+-          and M_Elements_Cst
+-            (S   => Model (Container),
+-             Fst => Length (Container)'Old + 1,
+-             Lst => Length (Container),
+-             E   => New_Item)
++          and M.Constant_Range
++            (Container => Model (Container),
++             Fst       => Length (Container)'Old + 1,
++             Lst       => Length (Container),
++             Item      => New_Item)
+ 
+           --  Count cursors have been inserted at the end of Container
+           and P_Positions_Truncated
+@@ -741,16 +695,16 @@ is
+           and Position = No_Element
+ 
+           --  The elements of Container located before Position are preserved.
+-          and M_Elements_Equal
+-            (S1  => Model (Container)'Old,
+-             S2  => Model (Container),
+-             Fst => 1,
+-             Lst => P.Get (Positions (Container)'Old, Position'Old) - 1)
++          and M.Range_Equal
++            (Left  => Model (Container)'Old,
++             Right => Model (Container),
++             Fst   => 1,
++             Lst   => P.Get (Positions (Container)'Old, Position'Old) - 1)
+ 
+           --  The elements located after Position are shifted by 1
+-          and M_Elements_Shifted
+-            (S1     => Model (Container)'Old,
+-             S2     => Model (Container),
++          and M.Range_Shifted
++            (Left   => Model (Container)'Old,
++             Right  => Model (Container),
+              Fst    => P.Get (Positions (Container)'Old, Position'Old) + 1,
+              Lst    => Length (Container)'Old,
+              Offset => -1)
+@@ -776,11 +730,11 @@ is
+           and Position = No_Element
+ 
+           --  The elements of Container located before Position are preserved.
+-          and M_Elements_Equal
+-            (S1  => Model (Container)'Old,
+-             S2  => Model (Container),
+-             Fst => 1,
+-             Lst => P.Get (Positions (Container)'Old, Position'Old) - 1),
++          and M.Range_Equal
++            (Left  => Model (Container)'Old,
++             Right => Model (Container),
++             Fst   => 1,
++             Lst   => P.Get (Positions (Container)'Old, Position'Old) - 1),
+      Contract_Cases =>
+ 
+        --  All the elements after Position have been erased
+@@ -800,9 +754,9 @@ is
+           Length (Container) = Length (Container)'Old - Count
+ 
+           --  Other elements are shifted by Count
+-          and M_Elements_Shifted
+-            (S1     => Model (Container)'Old,
+-             S2     => Model (Container),
++          and M.Range_Shifted
++            (Left   => Model (Container)'Old,
++             Right  => Model (Container),
+              Fst    =>
+                P.Get (Positions (Container)'Old, Position'Old) + Count,
+              Lst    => Length (Container)'Old,
+@@ -823,9 +777,9 @@ is
+        Length (Container) = Length (Container)'Old - 1
+ 
+           --  The elements of Container are shifted by 1
+-          and M_Elements_Shifted
+-            (S1     => Model (Container)'Old,
+-             S2     => Model (Container),
++          and M.Range_Shifted
++            (Left   => Model (Container)'Old,
++             Right  => Model (Container),
+              Fst    => 2,
+              Lst    => Length (Container)'Old,
+              Offset => -1)
+@@ -849,9 +803,9 @@ is
+           Length (Container) = Length (Container)'Old - Count
+ 
+           --  Elements of Container are shifted by Count
+-          and M_Elements_Shifted
+-            (S1     => Model (Container)'Old,
+-             S2     => Model (Container),
++          and M.Range_Shifted
++            (Left   => Model (Container)'Old,
++             Right  => Model (Container),
+              Fst    => Count + 1,
+              Lst    => Length (Container)'Old,
+              Offset => -Count)
+@@ -874,8 +828,16 @@ is
+           and Model (Container) <= Model (Container)'Old
+ 
+           --  The last cursor of Container has been removed
+-          and P.Is_Add (Positions (Container), Last (Container)'Old,
+-                        Length (Container)'Old, Positions (Container)'Old);
++          and not P.Has_Key (Positions (Container), Last (Container)'Old)
++
++          --  Other cursors are still valid
++          and P.Keys_Included_Except
++            (Left    => Positions (Container)'Old,
++             Right   => Positions (Container)'Old,
++             New_Key => Last (Container)'Old)
++
++          --  The positions of other cursors are preserved
++          and Positions (Container) <= Positions (Container)'Old;
+ 
+    procedure Delete_Last
+      (Container : in out List;
+@@ -949,17 +911,17 @@ is
+        (Before = No_Element =>
+ 
+           --  The elements of Target are preserved
+-          M_Elements_Equal
+-            (S1  => Model (Target)'Old,
+-             S2  => Model (Target),
+-             Fst => 1,
+-             Lst => Length (Target)'Old)
++          M.Range_Equal
++            (Left  => Model (Target)'Old,
++             Right => Model (Target),
++             Fst   => 1,
++             Lst   => Length (Target)'Old)
+ 
+           --  The elements of Source are appended to target, the order is not
+           --  specified.
+           and M_Elements_Shuffle
+-            (S1     => Model (Source)'Old,
+-             S2     => Model (Target),
++            (Left   => Model (Source)'Old,
++             Right  => Model (Target),
+              Fst    => 1,
+              Lst    => Length (Source)'Old,
+              Offset => Length (Target)'Old)
+@@ -973,25 +935,25 @@ is
+         others              =>
+ 
+           --  The elements of Target located before Before are preserved
+-          M_Elements_Equal
+-            (S1  => Model (Target)'Old,
+-             S2  => Model (Target),
+-             Fst => 1,
+-             Lst => P.Get (Positions (Target)'Old, Before) - 1)
++          M.Range_Equal
++            (Left  => Model (Target)'Old,
++             Right => Model (Target),
++             Fst   => 1,
++             Lst   => P.Get (Positions (Target)'Old, Before) - 1)
+ 
+           --  The elements of Source are inserted before Before, the order is
+           --  not specified.
+           and M_Elements_Shuffle
+-            (S1     => Model (Source)'Old,
+-             S2     => Model (Target),
++            (Left   => Model (Source)'Old,
++             Right  => Model (Target),
+              Fst    => 1,
+              Lst    => Length (Source)'Old,
+              Offset => P.Get (Positions (Target)'Old, Before) - 1)
+ 
+           --  Other elements are shifted by the length of Source
+-          and M_Elements_Shifted
+-            (S1     => Model (Target)'Old,
+-             S2     => Model (Target),
++          and M.Range_Shifted
++            (Left   => Model (Target)'Old,
++             Right  => Model (Target),
+              Fst    => P.Get (Positions (Target)'Old, Before),
+              Lst    => Length (Target)'Old,
+              Offset => Length (Source)'Old)
+@@ -1021,16 +983,16 @@ is
+           and Length (Source) = Length (Source)'Old - 1
+ 
+           --  The elements of Source located before Position are preserved.
+-          and M_Elements_Equal
+-            (S1  => Model (Source)'Old,
+-             S2  => Model (Source),
+-             Fst => 1,
+-             Lst => P.Get (Positions (Source)'Old, Position'Old) - 1)
++          and M.Range_Equal
++            (Left  => Model (Source)'Old,
++             Right => Model (Source),
++             Fst   => 1,
++             Lst   => P.Get (Positions (Source)'Old, Position'Old) - 1)
+ 
+           --  The elements located after Position are shifted by 1
+-          and M_Elements_Shifted
+-            (S1     => Model (Source)'Old,
+-             S2     => Model (Source),
++          and M.Range_Shifted
++            (Left   => Model (Source)'Old,
++             Right  => Model (Source),
+              Fst    => P.Get (Positions (Source)'Old, Position'Old) + 1,
+              Lst    => Length (Source)'Old,
+              Offset => -1)
+@@ -1044,7 +1006,7 @@ is
+           --  Positions is valid in Target and it is located either before
+           --  Before if it is valid in Target or at the end if it is
+           --  No_Element.
+-          and P.Mem (Positions (Target), Position)
++          and P.Has_Key (Positions (Target), Position)
+           and (if Before = No_Element
+                then P.Get (Positions (Target), Position)
+                   = Length (Target)
+@@ -1052,16 +1014,16 @@ is
+                   = P.Get (Positions (Target)'Old, Before))
+ 
+           --  The elements of Target located before Position are preserved.
+-          and M_Elements_Equal
+-            (S1  => Model (Target)'Old,
+-             S2  => Model (Target),
+-             Fst => 1,
+-             Lst => P.Get (Positions (Target), Position) - 1)
++          and M.Range_Equal
++            (Left  => Model (Target)'Old,
++             Right => Model (Target),
++             Fst   => 1,
++             Lst   => P.Get (Positions (Target), Position) - 1)
+ 
+           --  Other elements are shifted by 1.
+-          and M_Elements_Shifted
+-            (S1     => Model (Target)'Old,
+-             S2     => Model (Target),
++          and M.Range_Shifted
++            (Left   => Model (Target)'Old,
++             Right  => Model (Target),
+              Fst    => P.Get (Positions (Target), Position),
+              Lst    => Length (Target)'Old,
+              Offset => 1)
+@@ -1095,16 +1057,16 @@ is
+         Before = No_Element =>
+ 
+           --  The elements located before Position are preserved
+-          M_Elements_Equal
+-            (S1  => Model (Container)'Old,
+-             S2  => Model (Container),
+-             Fst => 1,
+-             Lst => P.Get (Positions (Container)'Old, Position) - 1)
++          M.Range_Equal
++            (Left  => Model (Container)'Old,
++             Right => Model (Container),
++             Fst   => 1,
++             Lst   => P.Get (Positions (Container)'Old, Position) - 1)
+ 
+           --  The elements located after Position are shifted by 1
+-          and M_Elements_Shifted
+-            (S1     => Model (Container)'Old,
+-             S2     => Model (Container),
++          and M.Range_Shifted
++            (Left   => Model (Container)'Old,
++             Right  => Model (Container),
+              Fst    => P.Get (Positions (Container)'Old, Position) + 1,
+              Lst    => Length (Container)'Old,
+              Offset => -1)
+@@ -1117,45 +1079,45 @@ is
+ 
+           --  Cursors from Container continue designating the same elements
+           and Mapping_Preserved
+-            (S1     => Model (Container)'Old,
+-             S2     => Model (Container),
+-             M1     => Positions (Container)'Old,
+-             M2     => Positions (Container)),
++            (M_Left  => Model (Container)'Old,
++             M_Right => Model (Container),
++             P_Left  => Positions (Container)'Old,
++             P_Right => Positions (Container)),
+ 
+         others              =>
+ 
+           --  The elements located before Position and Before are preserved
+-          M_Elements_Equal
+-            (S1  => Model (Container)'Old,
+-             S2  => Model (Container),
+-             Fst => 1,
+-             Lst => Count_Type'Min
+-                      (P.Get (Positions (Container)'Old, Position) - 1,
+-                       P.Get (Positions (Container)'Old, Before) - 1))
++          M.Range_Equal
++            (Left  => Model (Container)'Old,
++             Right => Model (Container),
++             Fst   => 1,
++             Lst   => Count_Type'Min
++               (P.Get (Positions (Container)'Old, Position) - 1,
++                P.Get (Positions (Container)'Old, Before) - 1))
+ 
+           --  The elements located after Position and Before are preserved
+-          and M_Elements_Equal
+-            (S1  => Model (Container)'Old,
+-             S2  => Model (Container),
+-             Fst => Count_Type'Max
+-                      (P.Get (Positions (Container)'Old, Position) + 1,
+-                       P.Get (Positions (Container)'Old, Before) + 1),
+-             Lst => Length (Container))
++          and M.Range_Equal
++            (Left  => Model (Container)'Old,
++             Right => Model (Container),
++             Fst   => Count_Type'Max
++               (P.Get (Positions (Container)'Old, Position) + 1,
++                P.Get (Positions (Container)'Old, Before) + 1),
++             Lst   => Length (Container))
+ 
+           --  The elements located after Before and before Position are shifted
+           --  by 1 to the right.
+-          and M_Elements_Shifted
+-            (S1     => Model (Container)'Old,
+-             S2     => Model (Container),
++          and M.Range_Shifted
++            (Left   => Model (Container)'Old,
++             Right  => Model (Container),
+              Fst    => P.Get (Positions (Container)'Old, Before) + 1,
+              Lst    => P.Get (Positions (Container)'Old, Position) - 1,
+              Offset => 1)
+ 
+           --  The elements located after Position and before Before are shifted
+           --  by 1 to the left.
+-          and M_Elements_Shifted
+-            (S1     => Model (Container)'Old,
+-             S2     => Model (Container),
++          and M.Range_Shifted
++            (Left   => Model (Container)'Old,
++             Right  => Model (Container),
+              Fst    => P.Get (Positions (Container)'Old, Position) + 1,
+              Lst    => P.Get (Positions (Container)'Old, Before) - 1,
+              Offset => -1)
+@@ -1168,10 +1130,10 @@ is
+ 
+           --  Cursors from Container continue designating the same elements
+           and Mapping_Preserved
+-            (S1     => Model (Container)'Old,
+-             S2     => Model (Container),
+-             M1     => Positions (Container)'Old,
+-             M2     => Positions (Container)));
++            (M_Left  => Model (Container)'Old,
++             M_Right => Model (Container),
++             P_Left  => Positions (Container)'Old,
++             P_Right => Positions (Container)));
+ 
+    function First (Container : List) return Cursor with
+      Global         => null,
+@@ -1260,18 +1222,18 @@ is
+ 
+        --  If Item is not is not contained in Container after Position, Find
+        --  returns No_Element.
+-       (not M_Elements_Contains
+-          (S   => Model (Container),
+-           Fst => (if Position = No_Element then 1
+-                   else P.Get (Positions (Container), Position)),
+-           Lst => Length (Container),
+-           E   => Item)
++       (not M.Contains
++          (Container => Model (Container),
++           Fst       => (if Position = No_Element then 1
++                         else P.Get (Positions (Container), Position)),
++           Lst       => Length (Container),
++           Item      => Item)
+         =>
+           Find'Result = No_Element,
+ 
+         --  Otherwise, Find returns a valid cusror in Container
+         others =>
+-          P.Mem (Positions (Container), Find'Result)
++          P.Has_Key (Positions (Container), Find'Result)
+ 
+         --  The element designated by the result of Find is Item
+         and Element (Model (Container),
+@@ -1283,12 +1245,12 @@ is
+                >= P.Get (Positions (Container), Position))
+ 
+         --  It is the first occurence of Item in this slice
+-        and not M_Elements_Contains
+-          (S   => Model (Container),
+-           Fst => (if Position = No_Element then 1
+-                   else P.Get (Positions (Container), Position)),
+-           Lst => P.Get (Positions (Container), Find'Result) - 1,
+-           E   => Item));
++        and not M.Contains
++          (Container => Model (Container),
++           Fst       => (if Position = No_Element then 1
++                         else P.Get (Positions (Container), Position)),
++           Lst       => P.Get (Positions (Container), Find'Result) - 1,
++           Item      => Item));
+ 
+    function Reverse_Find
+      (Container : List;
+@@ -1302,18 +1264,18 @@ is
+ 
+        --  If Item is not is not contained in Container before Position, Find
+        --  returns No_Element.
+-       (not M_Elements_Contains
+-          (S   => Model (Container),
+-           Fst => 1,
+-           Lst => (if Position = No_Element then Length (Container)
+-                   else P.Get (Positions (Container), Position)),
+-           E   => Item)
++       (not M.Contains
++          (Container => Model (Container),
++           Fst       => 1,
++           Lst       => (if Position = No_Element then Length (Container)
++                         else P.Get (Positions (Container), Position)),
++           Item      => Item)
+         =>
+           Reverse_Find'Result = No_Element,
+ 
+         --  Otherwise, Find returns a valid cusror in Container
+         others =>
+-          P.Mem (Positions (Container), Reverse_Find'Result)
++          P.Has_Key (Positions (Container), Reverse_Find'Result)
+ 
+         --  The element designated by the result of Find is Item
+         and Element (Model (Container),
+@@ -1325,42 +1287,42 @@ is
+                <= P.Get (Positions (Container), Position))
+ 
+         --  It is the last occurence of Item in this slice
+-        and not M_Elements_Contains
+-          (S   => Model (Container),
+-           Fst => P.Get (Positions (Container), Reverse_Find'Result) + 1,
+-           Lst => (if Position = No_Element then Length (Container)
+-                   else P.Get (Positions (Container), Position)),
+-           E   => Item));
++        and not M.Contains
++          (Container => Model (Container),
++           Fst       => P.Get (Positions (Container), Reverse_Find'Result) + 1,
++           Lst       => (if Position = No_Element then Length (Container)
++                         else P.Get (Positions (Container), Position)),
++           Item      => Item));
+ 
+    function Contains
+      (Container : List;
+       Item      : Element_Type) return Boolean
+    with
+      Global => null,
+-     Post   => Contains'Result =
+-         M_Elements_Contains
+-          (S   => Model (Container),
+-           Fst => 1,
+-           Lst => Length (Container),
+-           E   => Item);
++     Post   =>
++         Contains'Result = M.Contains (Container => Model (Container),
++                                       Fst       => 1,
++                                       Lst       => Length (Container),
++                                       Item      => Item);
+ 
+    function Has_Element (Container : List; Position : Cursor) return Boolean
+    with
+      Global => null,
+-     Post   => Has_Element'Result = P.Mem (Positions (Container), Position);
++     Post   =>
++         Has_Element'Result = P.Has_Key (Positions (Container), Position);
+    pragma Annotate (GNATprove, Inline_For_Proof, Has_Element);
+ 
+    generic
+       with function "<" (Left, Right : Element_Type) return Boolean is <>;
+    package Generic_Sorting with SPARK_Mode is
+-      function M_Elements_Sorted (S : M.Sequence) return Boolean with
++      function M_Elements_Sorted (Container : M.Sequence) return Boolean with
+         Ghost,
+         Global => null,
+         Post   => M_Elements_Sorted'Result =
+-          (for all I in 1 .. M.Length (S) =>
+-             (for all J in I + 1 .. M.Length (S) =>
+-                  Element (S, I) = Element (S, J)
+-               or Element (S, I) < Element (S, J)));
++          (for all I in 1 .. M.Length (Container) =>
++             (for all J in I + 1 .. M.Length (Container) =>
++                  Element (Container, I) = Element (Container, J)
++               or Element (Container, I) < Element (Container, J)));
+       pragma Annotate (GNATprove, Inline_For_Proof, M_Elements_Sorted);
+ 
+       function Is_Sorted (Container : List) return Boolean with
+diff --git a/gcc/ada/a-cofuma.adb b/gcc/ada/a-cofuma.adb
+index e46f9ae85b2..39759f48681 100644
+--- a/gcc/ada/a-cofuma.adb
++++ b/gcc/ada/a-cofuma.adb
+@@ -38,21 +38,21 @@ package body Ada.Containers.Functional_Maps with SPARK_Mode => Off is
+    -- "=" --
+    ---------
+ 
+-   function "=" (M1 : Map; M2 : Map) return Boolean is
+-     (M1.Keys <= M2.Keys and M2 <= M1);
++   function "=" (Left : Map; Right : Map) return Boolean is
++     (Left.Keys <= Right.Keys and Right <= Left);
+ 
+    ----------
+    -- "<=" --
+    ----------
+ 
+-   function "<=" (M1 : Map; M2 : Map) return Boolean is
++   function "<=" (Left : Map; Right : Map) return Boolean is
+       I2 : Count_Type;
+ 
+    begin
+-      for I1 in 1 .. Length (M1.Keys) loop
+-         I2 := Find (M2.Keys, Get (M1.Keys, I1));
++      for I1 in 1 .. Length (Left.Keys) loop
++         I2 := Find (Right.Keys, Get (Left.Keys, I1));
+          if I2 = 0
+-           or else Get (M2.Elements, I2) /= Get (M1.Elements, I1)
++           or else Get (Right.Elements, I2) /= Get (Left.Elements, I1)
+          then
+             return False;
+          end if;
+@@ -64,103 +64,185 @@ package body Ada.Containers.Functional_Maps with SPARK_Mode => Off is
+    -- Add --
+    ---------
+ 
+-   function Add (M : Map; K : Key_Type; E : Element_Type) return Map is
++   function Add
++     (Container : Map;
++      New_Key   : Key_Type;
++      New_Item  : Element_Type) return Map
++   is
+    begin
+       return
+-        (Keys     => Add (M.Keys, Length (M.Keys) + 1, K),
+-         Elements => Add (M.Elements, Length (M.Elements) + 1, E));
++        (Keys     =>
++           Add (Container.Keys, Length (Container.Keys) + 1, New_Key),
++         Elements =>
++           Add
++             (Container.Elements, Length (Container.Elements) + 1, New_Item));
+    end Add;
+ 
++   ---------------------------
++   -- Elements_Equal_Except --
++   ---------------------------
++
++   function Elements_Equal_Except
++     (Left    : Map;
++      Right   : Map;
++      New_Key : Key_Type) return Boolean
++   is
++   begin
++      for I in 1 .. Length (Left.Keys) loop
++         declare
++            K : constant Key_Type := Get (Left.Keys, I);
++         begin
++            if not Equivalent_Keys (K, New_Key)
++              and then Get (Right.Elements, Find (Right.Keys, K))
++                    /= Get (Left.Elements, I)
++            then
++               return False;
++            end if;
++         end;
++      end loop;
++      return True;
++   end Elements_Equal_Except;
++
++   function Elements_Equal_Except
++     (Left  : Map;
++      Right : Map;
++      X, Y  : Key_Type) return Boolean
++   is
++   begin
++      for I in 1 .. Length (Left.Keys) loop
++         declare
++            K : constant Key_Type := Get (Left.Keys, I);
++         begin
++            if not Equivalent_Keys (K, X)
++              and then not Equivalent_Keys (K, Y)
++              and then Get (Right.Elements, Find (Right.Keys, K))
++                    /= Get (Left.Elements, I)
++            then
++               return False;
++            end if;
++         end;
++      end loop;
++      return True;
++   end Elements_Equal_Except;
++
+    ---------
+    -- Get --
+    ---------
+ 
+-   function Get (M : Map; K : Key_Type) return Element_Type is
++   function Get (Container : Map; Key : Key_Type) return Element_Type is
+    begin
+-      return Get (M.Elements, Find (M.Keys, K));
++      return Get (Container.Elements, Find (Container.Keys, Key));
+    end Get;
+ 
+-   ------------
+-   -- Is_Add --
+-   ------------
++   -------------
++   -- Has_Key --
++   -------------
+ 
+-   function Is_Add
+-     (M      : Map;
+-      K      : Key_Type;
+-      E      : Element_Type;
+-      Result : Map) return Boolean
+-   is
++   function Has_Key (Container : Map; Key : Key_Type) return Boolean is
+    begin
+-      if Mem (M, K) or not Mem (Result, K) or Get (Result, K) /= E then
+-         return False;
+-      end if;
+-
+-      for K of M loop
+-         if not Mem (Result, K) or else Get (Result, K) /= Get (M, K) then
+-            return False;
+-         end if;
+-      end loop;
+-
+-      for KK of Result loop
+-         if KK /= K and not Mem (M, KK) then
+-            return False;
+-         end if;
+-      end loop;
+-
+-      return True;
+-   end Is_Add;
++      return Find (Container.Keys, Key) > 0;
++   end Has_Key;
+ 
+    --------------
+    -- Is_Empty --
+    --------------
+ 
+-   function Is_Empty (M : Map) return Boolean is
++   function Is_Empty (Container : Map) return Boolean is
+    begin
+-      return Length (M.Keys) = 0;
++      return Length (Container.Keys) = 0;
+    end Is_Empty;
+ 
+-   ------------
+-   -- Is_Set --
+-   ------------
++   -------------------
++   -- Keys_Included --
++   -------------------
++
++   function Keys_Included (Left : Map; Right : Map) return Boolean is
++   begin
++      for I in 1 .. Length (Left.Keys) loop
++         declare
++            K : constant Key_Type := Get (Left.Keys, I);
++         begin
++            if Find (Right.Keys, K) = 0 then
++               return False;
++            end if;
++         end;
++      end loop;
++      return True;
++   end Keys_Included;
++
++   --------------------------
++   -- Keys_Included_Except --
++   --------------------------
++
++   function Keys_Included_Except
++     (Left    : Map;
++      Right   : Map;
++      New_Key : Key_Type) return Boolean
++   is
++   begin
++      for I in 1 .. Length (Left.Keys) loop
++         declare
++            K : constant Key_Type := Get (Left.Keys, I);
++         begin
++            if not Equivalent_Keys (K, New_Key)
++              and then Find (Right.Keys, K) = 0
++            then
++               return False;
++            end if;
++         end;
++      end loop;
++      return True;
++   end Keys_Included_Except;
+ 
+-   function Is_Set
+-     (M      : Map;
+-      K      : Key_Type;
+-      E      : Element_Type;
+-      Result : Map) return Boolean
++   function Keys_Included_Except
++     (Left  : Map;
++      Right : Map;
++      X, Y  : Key_Type) return Boolean
+    is
+-     (Mem (M, K)
+-       and then Mem (Result, K)
+-       and then Get (Result, K) = E
+-       and then (for all KK of M =>
+-                   Mem (Result, KK)
+-                     and then
+-                       (if K /= KK then Get (Result, KK) = Get (M, KK)))
+-       and then (for all K of Result => Mem (M, K)));
++   begin
++      for I in 1 .. Length (Left.Keys) loop
++         declare
++            K : constant Key_Type := Get (Left.Keys, I);
++         begin
++            if not Equivalent_Keys (K, X)
++              and then not Equivalent_Keys (K, Y)
++              and then Find (Right.Keys, K) = 0
++            then
++               return False;
++            end if;
++         end;
++      end loop;
++      return True;
++   end Keys_Included_Except;
+ 
+    ------------
+    -- Length --
+    ------------
+ 
+-   function Length (M : Map) return Count_Type is
++   function Length (Container : Map) return Count_Type is
+    begin
+-      return Length (M.Elements);
++      return Length (Container.Elements);
+    end Length;
+ 
+-   ---------
+-   -- Mem --
+-   ---------
++   ---------------
++   -- Same_Keys --
++   ---------------
+ 
+-   function Mem (M : Map; K : Key_Type) return Boolean is
+-   begin
+-      return Find (M.Keys, K) > 0;
+-   end Mem;
++   function Same_Keys (Left : Map; Right : Map) return Boolean is
++      (Keys_Included (Left, Right)
++            and Keys_Included (Left => Right, Right => Left));
+ 
+    ---------
+    -- Set --
+    ---------
+ 
+-   function Set (M : Map; K : Key_Type; E : Element_Type) return Map is
+-     (Keys => M.Keys, Elements => Set (M.Elements, Find (M.Keys, K), E));
++   function Set
++     (Container : Map;
++      Key       : Key_Type;
++      New_Item  : Element_Type) return Map
++   is
++     (Keys     => Container.Keys,
++      Elements =>
++         Set (Container.Elements, Find (Container.Keys, Key), New_Item));
+ 
+ end Ada.Containers.Functional_Maps;
+diff --git a/gcc/ada/a-cofuma.ads b/gcc/ada/a-cofuma.ads
+index e6da44ae843..89adcb29e51 100644
+--- a/gcc/ada/a-cofuma.ads
++++ b/gcc/ada/a-cofuma.ads
+@@ -36,12 +36,8 @@ generic
+    type Key_Type (<>) is private;
+    type Element_Type (<>)  is private;
+    with function Equivalent_Keys (Left, Right : Key_Type) return Boolean;
+-   with function "=" (Left, Right : Element_Type) return Boolean is <>;
+-
+ package Ada.Containers.Functional_Maps with SPARK_Mode is
+ 
+-   pragma Assertion_Policy (Post => Ignore);
+-
+    type Map is private with
+      Default_Initial_Condition => Is_Empty (Map) and Length (Map) = 0,
+      Iterable                  => (First       => Iter_First,
+@@ -52,100 +48,179 @@ package Ada.Containers.Functional_Maps with SPARK_Mode is
+    --  "For in" quantification over maps should not be used.
+    --  "For of" quantification over maps iterates over keys.
+ 
+-   --  Maps are axiomatized using Mem and Get, encoding respectively the
++   -----------------------
++   --  Basic operations --
++   -----------------------
++
++   --  Maps are axiomatized using Has_Key and Get, encoding respectively the
+    --  presence of a key in a map and an accessor to elements associated to its
+    --  keys. The length of a map is also added to protect Add against overflows
+    --  but it is not actually modeled.
+ 
+-   function Mem (M : Map; K : Key_Type) return Boolean with
++   function Has_Key (Container : Map; Key : Key_Type) return Boolean with
+      Global => null;
++   --  Return True if Key is present in Container
+ 
+-   function Get (M : Map; K : Key_Type) return Element_Type with
++   function Get (Container : Map; Key : Key_Type) return Element_Type with
+      Global => null,
+-     Pre    => Mem (M, K);
++     Pre    => Has_Key (Container, Key);
++   --  Return the element associated to Key is present in Container
+ 
+-   function Length (M : Map) return Count_Type with
++   function Length (Container : Map) return Count_Type with
+      Global => null;
++   --  Return the number of mappings in Container
+ 
+-   function "<=" (M1 : Map; M2 : Map) return Boolean with
++   ------------------------
++   -- Property Functions --
++   ------------------------
++
++   function "<=" (Left : Map; Right : Map) return Boolean with
+    --  Map inclusion
+ 
+      Global => null,
+-     Post   => "<="'Result =
+-       (for all K of M1 =>
+-          Mem (M2, K) and then Get (M2, K) = Get (M1, K));
++     Post   =>
++       "<="'Result =
++         (for all Key of Left =>
++            Has_Key (Right, Key) and then Get (Right, Key) = Get (Left, Key));
+ 
+-   function "=" (M1 : Map; M2 : Map) return Boolean with
++   function "=" (Left : Map; Right : Map) return Boolean with
+    --  Extensional equality over maps
+ 
+      Global => null,
+-     Post   => "="'Result =
+-       ((for all K of M1 => Mem (M2, K) and then Get (M2, K) = Get (M1, K))
+-           and (for all K of M2 => Mem (M1, K)));
+-
+-   pragma Warnings (Off, "unused variable ""K""");
+-   function Is_Empty (M : Map) return Boolean with
++     Post   =>
++       "="'Result =
++         ((for all Key of Left =>
++                   Has_Key (Right, Key)
++           and then Get (Right, Key) = Get (Left, Key))
++          and (for all Key of Right => Has_Key (Left, Key)));
++
++   pragma Warnings (Off, "unused variable ""Key""");
++   function Is_Empty (Container : Map) return Boolean with
+    --  A map is empty if it contains no key
++
++     Global => null,
++     Post   => Is_Empty'Result = (for all Key of Container => False);
++   pragma Warnings (On, "unused variable ""Key""");
++
++   function Keys_Included (Left : Map; Right : Map) return Boolean
++   --  Returns True if every Key of Left is in Right
++
++   with
++     Global => null,
++     Post   =>
++       Keys_Included'Result = (for all Key of Left => Has_Key (Right, Key));
++
++   function Same_Keys (Left : Map; Right : Map) return Boolean
++   --  Returns True if Left and Right have the same keys
++
++   with
++     Global => null,
++     Post   =>
++       Same_Keys'Result =
++           (Keys_Included (Left, Right)
++            and Keys_Included (Left => Right, Right => Left));
++   pragma Annotate (GNATprove, Inline_For_Proof, Same_Keys);
++
++   function Keys_Included_Except
++     (Left    : Map;
++      Right   : Map;
++      New_Key : Key_Type) return Boolean
++   --  Returns True if Left contains only keys of Right and possibly New_Key
++
++   with
+      Global => null,
+-     Post   => Is_Empty'Result = (for all K of M => False);
+-   pragma Warnings (On, "unused variable ""K""");
++     Post   =>
++         Keys_Included_Except'Result =
++           (for all Key of Left =>
++              (if not Equivalent_Keys (Key, New_Key)
++               then Has_Key (Right, Key)));
+ 
+-   function Is_Add
+-     (M      : Map;
+-      K      : Key_Type;
+-      E      : Element_Type;
+-      Result : Map) return Boolean
+-   --  Returns True if Result is M augmented with the mapping K -> E
++   function Keys_Included_Except
++     (Left  : Map;
++      Right : Map;
++      X, Y  : Key_Type) return Boolean
++   --  Returns True if Left contains only keys of Right and possibly X and Y
++
++   with
++     Global => null,
++     Post   =>
++         Keys_Included_Except'Result =
++           (for all Key of Left =>
++              (if not Equivalent_Keys (Key, X) and not Equivalent_Keys (Key, Y)
++               then Has_Key (Right, Key)));
++
++   function Elements_Equal_Except
++     (Left    : Map;
++      Right   : Map;
++      New_Key : Key_Type) return Boolean
++   --  Returns True if all the keys of Left are mapped to the same elements in
++   --  Left and Right except New_Key.
+ 
+    with
+      Global => null,
++     Pre    => Keys_Included_Except (Left, Right, New_Key),
+      Post   =>
+-       Is_Add'Result =
+-         (not Mem (M, K)
+-            and then Mem (Result, K)
+-            and then Get (Result, K) = E
+-            and then (for all K of M =>
+-                        Mem (Result, K) and then Get (Result, K) = Get (M, K))
+-            and then (for all KK of Result =>
+-                        Equivalent_Keys (KK, K) or Mem (M, KK)));
+-
+-   function Add (M : Map; K : Key_Type; E : Element_Type) return Map with
+-   --  Returns M augmented with the mapping K -> E.
+-   --  Is_Add (M, K, E, Result) should be used instead of
+-   --  Result = Add (M, K, E) whenever possible both for execution and for
+-   --  proof.
++       Elements_Equal_Except'Result =
++         (for all Key of Left =>
++            (if not Equivalent_Keys (Key, New_Key)
++             then Get (Left, Key) = Get (Right, Key)));
++
++   function Elements_Equal_Except
++     (Left  : Map;
++      Right : Map;
++      X, Y  : Key_Type) return Boolean
++   --  Returns True if all the keys of Left are mapped to the same elements in
++   --  Left and Right except X and Y.
+ 
++   with
+      Global => null,
+-     Pre    => not Mem (M, K) and Length (M) < Count_Type'Last,
+-     Post   => Length (M) + 1 = Length (Add'Result)
+-               and Is_Add (M, K, E, Add'Result);
++     Pre    => Keys_Included_Except (Left, Right, X, Y),
++     Post   =>
++       Elements_Equal_Except'Result =
++         (for all Key of Left =>
++            (if not Equivalent_Keys (Key, X) and not Equivalent_Keys (Key, Y)
++             then Get (Left, Key) = Get (Right, Key)));
++
++   ----------------------------
++   -- Construction Functions --
++   ----------------------------
+ 
+-   function Is_Set
+-     (M : Map; K : Key_Type; E : Element_Type; Result : Map) return Boolean
+-   --  Returns True if Result is M, where the element associated to K has been
+-   --  replaced by E.
++   --  For better efficiency of both proofs and execution, avoid using
++   --  construction functions in annotations and rather use property functions.
++
++   function Add
++     (Container : Map;
++      New_Key   : Key_Type;
++      New_Item  : Element_Type) return Map
++   --  Returns Container augmented with the mapping Key -> New_Item.
+ 
+    with
+      Global => null,
+-     Post   => Is_Set'Result =
+-         (Mem (M, K)
+-          and then Mem (Result, K)
+-          and then Get (Result, K) = E
+-          and then (for all KK of M => Mem (Result, KK)
+-               and then (if not Equivalent_Keys (K, KK)
+-                         then Get (Result, KK) = Get (M, KK)))
+-          and then (for all K of Result => Mem (M, K)));
+-
+-   function Set (M : Map; K : Key_Type; E : Element_Type) return Map with
+-   --  Returns M, where the element associated to K has been replaced by E.
+-   --  Is_Set (M, K, E, Result) should be used instead of
+-   --  Result = Set (M, K, E) whenever possible both for execution and for
+-   --  proof.
++     Pre    =>
++         not Has_Key (Container, New_Key)
++       and Length (Container) < Count_Type'Last,
++     Post   =>
++       Length (Container) + 1 = Length (Add'Result)
++       and Has_Key (Add'Result, New_Key)
++       and Get (Add'Result, New_Key) = New_Item
++       and Container <= Add'Result
++       and Keys_Included_Except (Add'Result, Container, New_Key);
++
++   function Set
++     (Container : Map;
++      Key       : Key_Type;
++      New_Item  : Element_Type) return Map
++   --  Returns Container, where the element associated to Key has been replaced
++   --  by New_Item.
+ 
++   with
+      Global => null,
+-     Pre    => Mem (M, K),
++     Pre    => Has_Key (Container, Key),
+      Post   =>
+-       Length (M) = Length (Set'Result) and Is_Set (M, K, E, Set'Result);
++       Length (Container) = Length (Set'Result)
++       and Get (Set'Result, Key) = New_Item
++       and Same_Keys (Container, Set'Result)
++       and Elements_Equal_Except (Container, Set'Result, Key);
+ 
+    ---------------------------
+    --  Iteration Primitives --
+@@ -153,20 +228,25 @@ package Ada.Containers.Functional_Maps with SPARK_Mode is
+ 
+    type Private_Key is private;
+ 
+-   function Iter_First (M : Map) return Private_Key with
++   function Iter_First (Container : Map) return Private_Key with
+      Global => null;
+ 
+-   function Iter_Has_Element (M : Map; K : Private_Key) return Boolean with
++   function Iter_Has_Element
++     (Container : Map;
++      Key       : Private_Key) return Boolean
++   with
+      Global => null;
+ 
+-   function Iter_Next (M : Map; K : Private_Key) return Private_Key with
++   function Iter_Next (Container : Map; Key : Private_Key) return Private_Key
++   with
+      Global => null,
+-     Pre    => Iter_Has_Element (M, K);
++     Pre    => Iter_Has_Element (Container, Key);
+ 
+-   function Iter_Element (M : Map; K : Private_Key) return Key_Type with
++   function Iter_Element (Container : Map; Key : Private_Key) return Key_Type
++   with
+      Global => null,
+-     Pre    => Iter_Has_Element (M, K);
+-   pragma Annotate (GNATprove, Iterable_For_Proof, "Contains", Mem);
++     Pre    => Iter_Has_Element (Container, Key);
++   pragma Annotate (GNATprove, Iterable_For_Proof, "Contains", Has_Key);
+ 
+ private
+ 
+@@ -193,15 +273,20 @@ private
+ 
+    type Private_Key is new Count_Type;
+ 
+-   function Iter_First (M : Map) return Private_Key is (1);
++   function Iter_First (Container : Map) return Private_Key is (1);
+ 
+-   function Iter_Has_Element (M : Map; K : Private_Key) return Boolean is
+-     (Count_Type (K) in 1 .. Key_Containers.Length (M.Keys));
++   function Iter_Has_Element
++     (Container : Map;
++      Key       : Private_Key) return Boolean
++   is
++     (Count_Type (Key) in 1 .. Key_Containers.Length (Container.Keys));
+ 
+-   function Iter_Next (M : Map; K : Private_Key) return Private_Key is
+-     (if K = Private_Key'Last then 0 else K + 1);
++   function Iter_Next (Container : Map; Key : Private_Key) return Private_Key
++   is
++     (if Key = Private_Key'Last then 0 else Key + 1);
+ 
+-   function Iter_Element (M : Map; K : Private_Key) return Key_Type is
+-     (Key_Containers.Get (M.Keys, Count_Type (K)));
++   function Iter_Element (Container : Map; Key : Private_Key) return Key_Type
++   is
++     (Key_Containers.Get (Container.Keys, Count_Type (Key)));
+ 
+ end Ada.Containers.Functional_Maps;
+diff --git a/gcc/ada/a-cofuse.adb b/gcc/ada/a-cofuse.adb
+index 12881753c31..d9b4c1dbe78 100644
+--- a/gcc/ada/a-cofuse.adb
++++ b/gcc/ada/a-cofuse.adb
+@@ -38,101 +38,107 @@ package body Ada.Containers.Functional_Sets with SPARK_Mode => Off is
+    -- "=" --
+    ---------
+ 
+-   function "=" (S1 : Set; S2 : Set) return Boolean is
+-     (S1.Content <= S2.Content and S2.Content <= S1.Content);
++   function "=" (Left : Set; Right : Set) return Boolean is
++     (Left.Content <= Right.Content and Right.Content <= Left.Content);
+ 
+    ----------
+    -- "<=" --
+    ----------
+ 
+-   function "<=" (S1 : Set; S2 : Set) return Boolean is
+-     (S1.Content <= S2.Content);
++   function "<=" (Left : Set; Right : Set) return Boolean is
++     (Left.Content <= Right.Content);
+ 
+    ---------
+    -- Add --
+    ---------
+ 
+-   function Add (S : Set; E : Element_Type) return Set is
+-     (Content => Add (S.Content, Length (S.Content) + 1, E));
++   function Add (Container : Set; Item : Element_Type) return Set is
++     (Content =>
++         Add (Container.Content, Length (Container.Content) + 1, Item));
+ 
+-   ------------------
+-   -- Intersection --
+-   ------------------
++   --------------
++   -- Contains --
++   --------------
+ 
+-   function Intersection (S1 : Set; S2 : Set) return Set is
+-     (Content => Intersection (S1.Content, S2.Content));
++   function Contains (Container : Set; Item : Element_Type) return Boolean is
++     (Find (Container.Content, Item) > 0);
+ 
+-   ------------
+-   -- Is_Add --
+-   ------------
++   ---------------------
++   -- Included_Except --
++   ---------------------
+ 
+-   function Is_Add (S : Set; E : Element_Type; Result : Set) return Boolean
++   function Included_Except
++     (Left  : Set;
++      Right : Set;
++      Item  : Element_Type) return Boolean
+    is
+-     (Mem (Result, E)
+-        and (for all F of Result => Mem (S, F) or F = E)
+-        and (for all E of S => Mem (Result, E)));
++     (for all E of Left =>
++         Equivalent_Elements (E, Item) or Contains (Right, E));
+ 
+-   --------------
+-   -- Is_Empty --
+-   --------------
++   -----------------------
++   -- Included_In_Union --
++   -----------------------
+ 
+-   function Is_Empty (S : Set) return Boolean is (Length (S.Content) = 0);
++   function Included_In_Union
++     (Container : Set;
++      Left      : Set;
++      Right     : Set) return Boolean
++   is
++     (for all Item of Container =>
++         Contains (Left, Item) or Contains (Right, Item));
+ 
+-   ---------------------
+-   -- Is_Intersection --
+-   ---------------------
++   ---------------------------
++   -- Includes_Intersection --
++   ---------------------------
+ 
+-   function Is_Intersection
+-     (S1     : Set;
+-      S2     : Set;
+-      Result : Set) return Boolean
++   function Includes_Intersection
++     (Container : Set;
++      Left      : Set;
++      Right     : Set) return Boolean
+    is
+-     ((for all E of Result =>
+-         Mem (S1, E)
+-           and Mem (S2, E))
+-           and (for all E of S1 => (if Mem (S2, E) then Mem (Result, E))));
++     (for all Item of Left =>
++        (if Contains (Right, Item) then Contains (Container, Item)));
++
++   ------------------
++   -- Intersection --
++   ------------------
++
++   function Intersection (Left : Set; Right : Set) return Set is
++     (Content => Intersection (Left.Content, Right.Content));
+ 
+    --------------
+-   -- Is_Union --
++   -- Is_Empty --
+    --------------
+ 
+-   function Is_Union (S1 : Set; S2 : Set; Result : Set) return Boolean is
+-     ((for all E of Result => Mem (S1, E) or Mem (S2, E))
+-         and (for all E of S1 => Mem (Result, E))
+-         and (for all E of S2 => Mem (Result, E)));
++   function Is_Empty (Container : Set) return Boolean is
++     (Length (Container.Content) = 0);
+ 
+    ------------
+    -- Length --
+    ------------
+ 
+-   function Length (S : Set) return Count_Type is (Length (S.Content));
+-
+-   ---------
+-   -- Mem --
+-   ---------
+-
+-   function Mem (S : Set; E : Element_Type) return Boolean is
+-     (Find (S.Content, E) > 0);
++   function Length (Container : Set) return Count_Type is
++     (Length (Container.Content));
+ 
+    ------------------
+    -- Num_Overlaps --
+    ------------------
+ 
+-   function Num_Overlaps (S1 : Set; S2 : Set) return Count_Type is
+-     (Num_Overlaps (S1.Content, S2.Content));
++   function Num_Overlaps (Left : Set; Right : Set) return Count_Type is
++     (Num_Overlaps (Left.Content, Right.Content));
+ 
+    ------------
+    -- Remove --
+    ------------
+ 
+-   function Remove (S : Set; E : Element_Type) return Set is
+-     (Content => Remove (S.Content, Find (S.Content, E)));
++   function Remove (Container : Set; Item : Element_Type) return Set is
++     (Content => Remove (Container.Content, Find (Container.Content, Item)));
+ 
+    -----------
+    -- Union --
+    -----------
+ 
+-   function Union (S1 : Set; S2 : Set) return Set is
+-     (Content => Union (S1.Content, S2.Content));
++   function Union (Left : Set; Right : Set) return Set is
++     (Content => Union (Left.Content, Right.Content));
+ 
+ end Ada.Containers.Functional_Sets;
+diff --git a/gcc/ada/a-cofuse.ads b/gcc/ada/a-cofuse.ads
+index 410b1cb3d6f..f9848f9d4ed 100644
+--- a/gcc/ada/a-cofuse.ads
++++ b/gcc/ada/a-cofuse.ads
+@@ -34,12 +34,10 @@ private with Ada.Containers.Functional_Base;
+ 
+ generic
+    type Element_Type (<>) is private;
+-   with function "=" (Left, Right : Element_Type) return Boolean is <>;
+-
++   with
++     function Equivalent_Elements (Left, Right : Element_Type) return Boolean;
+ package Ada.Containers.Functional_Sets with SPARK_Mode is
+ 
+-   pragma Assertion_Policy (Post => Ignore);
+-
+    type Set is private with
+      Default_Initial_Condition => Is_Empty (Set) and Length (Set) = 0,
+      Iterable                  => (First       => Iter_First,
+@@ -50,130 +48,154 @@ package Ada.Containers.Functional_Sets with SPARK_Mode is
+    --  "For in" quantification over sets should not be used.
+    --  "For of" quantification over sets iterates over elements.
+ 
+-   --  Sets are axiomatized using Mem, which encodes whether an element is
++   -----------------------
++   --  Basic operations --
++   -----------------------
++
++   --  Sets are axiomatized using Contains, which encodes whether an element is
+    --  contained in a set. The length of a set is also added to protect Add
+    --  against overflows but it is not actually modeled.
+ 
+-   function Mem (S : Set; E : Element_Type) return Boolean with
++   function Contains (Container : Set; Item : Element_Type) return Boolean with
+      Global => null;
++   --  Return True if Item is contained in Container
+ 
+-   function Length (S : Set) return Count_Type with
++   function Length (Container : Set) return Count_Type with
+      Global => null;
++   --  Return the number of elements in Container
++
++   ------------------------
++   -- Property Functions --
++   ------------------------
+ 
+-   function "<=" (S1 : Set; S2 : Set) return Boolean with
++   function "<=" (Left : Set; Right : Set) return Boolean with
+    --  Set inclusion
+ 
+      Global => null,
+-     Post   => "<="'Result = (for all E of S1 => Mem (S2, E));
++     Post   => "<="'Result = (for all Item of Left => Contains (Right, Item));
+ 
+-   function "=" (S1 : Set; S2 : Set) return Boolean with
++   function "=" (Left : Set; Right : Set) return Boolean with
+    --  Extensional equality over sets
+ 
+      Global => null,
+      Post   =>
+        "="'Result =
+-         ((for all E of S1 => Mem (S2, E))
+-             and (for all E of S2 => Mem (S1, E)));
++         ((for all Item of Left => Contains (Right, Item))
++             and (for all Item of Right => Contains (Left, Item)));
+ 
+-   pragma Warnings (Off, "unused variable ""E""");
+-   function Is_Empty (S : Set) return Boolean with
++   pragma Warnings (Off, "unused variable ""Item""");
++   function Is_Empty (Container : Set) return Boolean with
+    --  A set is empty if it contains no element
+ 
+      Global => null,
+-     Post   => Is_Empty'Result = (for all E of S => False);
+-   pragma Warnings (On, "unused variable ""E""");
++     Post   => Is_Empty'Result = (for all Item of Container => False);
++   pragma Warnings (On, "unused variable ""Item""");
+ 
+-   function Is_Add (S : Set; E : Element_Type; Result : Set) return Boolean
+-   --  Returns True if Result is S augmented with E
++   function Included_Except
++     (Left  : Set;
++      Right : Set;
++      Item  : Element_Type) return Boolean
++   --  Return True if Left contains only elements of Right except possibly
++   --  Item.
+ 
+    with
+      Global => null,
+      Post   =>
+-       Is_Add'Result =
+-         (Mem (Result, E)
+-            and not Mem (S, E)
+-            and (for all F of Result => Mem (S, F) or F = E)
+-            and (for all E of S => Mem (Result, E)));
+-
+-   function Add (S : Set; E : Element_Type) return Set with
+-   --  Returns S augmented with E.
+-   --  Is_Add (S, E, Result) should be used instead of Result = Add (S, E)
+-   --  whenever possible both for execution and for proof.
++       Included_Except'Result =
++           (for all E of Left =>
++              Contains (Right, E) or Equivalent_Elements (E, Item));
++
++   function Includes_Intersection
++     (Container : Set;
++      Left      : Set;
++      Right     : Set) return Boolean
++   with
++   --  Return True if every element of the intersection of Left and Right is
++   --  in Container.
+ 
+      Global => null,
+-     Pre    => not Mem (S, E) and Length (S) < Count_Type'Last,
+      Post   =>
+-       Length (Add'Result) = Length (S) + 1
+-         and Is_Add (S, E, Add'Result);
+-
+-   function Remove (S : Set; E : Element_Type) return Set with
+-   --  Returns S without E.
+-   --  Is_Add (Result, E, S) should be used instead of Result = Remove (S, E)
+-   --  whenever possible both for execution and for proof.
++       Includes_Intersection'Result =
++         (for all Item of Left =>
++             (if Contains (Right, Item) then Contains (Container, Item)));
++
++   function Included_In_Union
++     (Container : Set;
++      Left      : Set;
++      Right     : Set) return Boolean
++   with
++   --  Return True if every element of Container is the union of Left and Right
+ 
+      Global => null,
+-     Pre    => Mem (S, E),
+      Post   =>
+-       Length (Remove'Result) = Length (S) - 1
+-         and Is_Add (Remove'Result, E, S);
++       Included_In_Union'Result =
++         (for all Item of Container =>
++            Contains (Left, Item) or Contains (Right, Item));
+ 
+-   function Is_Intersection
+-     (S1     : Set;
+-      S2     : Set;
+-      Result : Set) return Boolean
+-   with
+-   --  Returns True if Result is the intersection of S1 and S2
++   function Num_Overlaps (Left : Set; Right : Set) return Count_Type with
++   --  Number of elements that are both in Left and Right
+ 
+      Global => null,
+      Post   =>
+-       Is_Intersection'Result =
+-         ((for all E of Result => Mem (S1, E) and Mem (S2, E))
+-             and (for all E of S1 => (if Mem (S2, E) then Mem (Result, E))));
++       Num_Overlaps'Result <= Length (Left)
++         and Num_Overlaps'Result <= Length (Right)
++         and (if Num_Overlaps'Result = 0 then
++               (for all Item of Left => not Contains (Right, Item)));
++
++   ----------------------------
++   -- Construction Functions --
++   ----------------------------
+ 
+-   function Num_Overlaps (S1 : Set; S2 : Set) return Count_Type with
+-   --  Number of elements that are both in S1 and S2
++   --  For better efficiency of both proofs and execution, avoid using
++   --  construction functions in annotations and rather use property functions.
++
++   function Add (Container : Set; Item : Element_Type) return Set with
++   --  Return a new set containing all the elements of Container plus E
+ 
+      Global => null,
++     Pre    =>
++       not Contains (Container, Item)
++       and Length (Container) < Count_Type'Last,
+      Post   =>
+-       Num_Overlaps'Result <= Length (S1)
+-         and Num_Overlaps'Result <= Length (S2)
+-         and (if Num_Overlaps'Result = 0 then
+-               (for all E of S1 => not Mem (S2, E)));
++       Length (Add'Result) = Length (Container) + 1
++       and Contains (Add'Result, Item)
++       and Container <= Add'Result
++       and Included_Except (Add'Result, Container, Item);
+ 
+-   function Intersection (S1 : Set; S2 : Set) return Set with
+-   --  Returns the intersection of S1 and S2.
+-   --  Intersection (S1, S2, Result) should be used instead of
+-   --  Result = Intersection (S1, S2) whenever possible both for execution and
+-   --  for proof.
++   function Remove (Container : Set; Item : Element_Type) return Set with
++   --  Return a new set containing all the elements of Container except E
+ 
+      Global => null,
++     Pre    => Contains (Container, Item),
+      Post   =>
+-       Length (Intersection'Result) = Num_Overlaps (S1, S2)
+-         and Is_Intersection (S1, S2, Intersection'Result);
++       Length (Remove'Result) = Length (Container) - 1
++       and not Contains (Remove'Result, Item)
++       and Remove'Result <= Container
++       and Included_Except (Container, Remove'Result, Item);
+ 
+-   function Is_Union (S1 : Set; S2 : Set; Result : Set) return Boolean with
+-   --  Returns True if Result is the union of S1 and S2
++   function Intersection (Left : Set; Right : Set) return Set with
++   --  Returns the intersection of Left and Right
+ 
+      Global => null,
+      Post   =>
+-       Is_Union'Result =
+-         ((for all E of Result => Mem (S1, E) or Mem (S2, E))
+-             and (for all E of S1 => Mem (Result, E))
+-             and (for all E of S2 => Mem (Result, E)));
++       Length (Intersection'Result) = Num_Overlaps (Left, Right)
++         and Intersection'Result <= Left
++         and Intersection'Result <= Right
++         and Includes_Intersection (Intersection'Result, Left, Right);
+ 
+-   function Union (S1 : Set; S2 : Set) return Set with
+-   --  Returns the union of S1 and S2.
+-   --  Is_Union (S1, S2, Result) should be used instead of
+-   --  Result = Union (S1, S2) whenever possible both for execution and for
+-   --  proof.
++   function Union (Left : Set; Right : Set) return Set with
++   --  Returns the union of Left and Right
+ 
+      Global => null,
+      Pre    =>
+-       Length (S1) - Num_Overlaps (S1, S2) <= Count_Type'Last - Length (S2),
++       Length (Left) - Num_Overlaps (Left, Right)
++         <= Count_Type'Last - Length (Right),
+      Post   =>
+        Length (Union'Result) =
+-         Length (S1) - Num_Overlaps (S1, S2) + Length (S2)
+-           and Is_Union (S1, S2, Union'Result);
++         Length (Left) - Num_Overlaps (Left, Right) + Length (Right)
++           and Left <= Union'Result
++           and Right <= Union'Result
++           and Included_In_Union (Union'Result, Left, Right);
+ 
+    ---------------------------
+    --  Iteration Primitives --
+@@ -181,20 +203,27 @@ package Ada.Containers.Functional_Sets with SPARK_Mode is
+ 
+    type Private_Key is private;
+ 
+-   function Iter_First (S : Set) return Private_Key with
++   function Iter_First (Container : Set) return Private_Key with
+      Global => null;
+ 
+-   function Iter_Has_Element (S : Set; K : Private_Key) return Boolean with
++   function Iter_Has_Element
++     (Container : Set;
++      Key       : Private_Key) return Boolean
++   with
+      Global => null;
+ 
+-   function Iter_Next (S : Set; K : Private_Key) return Private_Key with
++   function Iter_Next (Container : Set; Key : Private_Key) return Private_Key
++   with
+      Global => null,
+-     Pre    => Iter_Has_Element (S, K);
++     Pre    => Iter_Has_Element (Container, Key);
+ 
+-   function Iter_Element (S : Set; K : Private_Key) return Element_Type with
++   function Iter_Element
++     (Container : Set;
++      Key       : Private_Key) return Element_Type
++   with
+      Global => null,
+-     Pre    => Iter_Has_Element (S, K);
+-   pragma Annotate (GNATprove, Iterable_For_Proof, "Contains", Mem);
++     Pre    => Iter_Has_Element (Container, Key);
++   pragma Annotate (GNATprove, Iterable_For_Proof, "Contains", Contains);
+ 
+ private
+ 
+@@ -212,15 +241,22 @@ private
+ 
+    type Private_Key is new Count_Type;
+ 
+-   function Iter_First (S : Set) return Private_Key is (1);
++   function Iter_First (Container : Set) return Private_Key is (1);
+ 
+-   function Iter_Has_Element (S : Set; K : Private_Key) return Boolean is
+-     (Count_Type (K) in 1 .. Containers.Length (S.Content));
++   function Iter_Has_Element
++     (Container : Set;
++      Key       : Private_Key) return Boolean
++   is
++     (Count_Type (Key) in 1 .. Containers.Length (Container.Content));
+ 
+-   function Iter_Next (S : Set; K : Private_Key) return Private_Key is
+-     (if K = Private_Key'Last then 0 else K + 1);
++   function Iter_Next (Container : Set; Key : Private_Key) return Private_Key
++   is
++     (if Key = Private_Key'Last then 0 else Key + 1);
+ 
+-   function Iter_Element (S : Set; K : Private_Key) return Element_Type is
+-     (Containers.Get (S.Content, Count_Type (K)));
++   function Iter_Element
++     (Container : Set;
++      Key       : Private_Key) return Element_Type
++   is
++     (Containers.Get (Container.Content, Count_Type (Key)));
+ 
+ end Ada.Containers.Functional_Sets;
+diff --git a/gcc/ada/a-cofuve.adb b/gcc/ada/a-cofuve.adb
+index fdab8c23a50..e8f8757468b 100644
+--- a/gcc/ada/a-cofuve.adb
++++ b/gcc/ada/a-cofuve.adb
+@@ -33,130 +33,216 @@ pragma Ada_2012;
+ package body Ada.Containers.Functional_Vectors with SPARK_Mode => Off is
+    use Containers;
+ 
+-   ---------
+-   -- "=" --
+-   ---------
+-
+-   function "=" (S1 : Sequence; S2 : Sequence) return Boolean is
+-     (S1.Content = S2.Content);
+-
+    ---------
+    -- "<" --
+    ---------
+ 
+-   function "<" (S1 : Sequence; S2 : Sequence) return Boolean is
+-     (Length (S1.Content) < Length (S2.Content)
+-       and then (for all I in Index_Type'First .. Last (S1) =>
+-                   Get (S1.Content, I) = Get (S2.Content, I)));
++   function "<" (Left : Sequence; Right : Sequence) return Boolean is
++     (Length (Left.Content) < Length (Right.Content)
++       and then (for all I in Index_Type'First .. Last (Left) =>
++                   Get (Left.Content, I) = Get (Right.Content, I)));
+ 
+    ----------
+    -- "<=" --
+    ----------
+ 
+-   function "<=" (S1 : Sequence; S2 : Sequence) return Boolean is
+-     (Length (S1.Content) <= Length (S2.Content)
+-       and then (for all I in Index_Type'First .. Last (S1) =>
+-                   Get (S1.Content, I) = Get (S2.Content, I)));
++   function "<=" (Left : Sequence; Right : Sequence) return Boolean is
++     (Length (Left.Content) <= Length (Right.Content)
++       and then (for all I in Index_Type'First .. Last (Left) =>
++                   Get (Left.Content, I) = Get (Right.Content, I)));
+ 
+    ---------
+-   -- Add --
++   -- "=" --
+    ---------
+ 
+-   function Add (S : Sequence; E : Element_Type) return Sequence is
+-     (Content => Add (S.Content,
+-                      Index_Type'Val
+-                        (Index_Type'Pos (Index_Type'First) +
+-                             Length (S.Content)),
+-                      E));
++   function "=" (Left : Sequence; Right : Sequence) return Boolean is
++     (Left.Content = Right.Content);
+ 
+    ---------
+-   -- Get --
++   -- Add --
+    ---------
+ 
+-   function Get (S : Sequence; N : Extended_Index) return Element_Type is
+-     (Get (S.Content, N));
+-
+-   ------------
+-   -- Insert --
+-   ------------
+-
+-   function Insert
+-     (S : Sequence;
+-      N : Index_Type;
+-      E : Element_Type) return Sequence
++   function Add (Container : Sequence; New_Item : Element_Type) return Sequence
+    is
+-     (Content => Add (S.Content, N, E));
+-
+-   ------------
+-   -- Is_Add --
+-   ------------
++     (Content => Add (Container.Content,
++                      Index_Type'Val
++                        (Index_Type'Pos (Index_Type'First) +
++                             Length (Container.Content)),
++                      New_Item));
+ 
+-   function Is_Add
+-     (S      : Sequence;
+-      E      : Element_Type;
+-      Result : Sequence) return Boolean
++   function Add
++     (Container : Sequence;
++      Position  : Index_Type;
++      New_Item  : Element_Type) return Sequence
++   is
++     (Content => Add (Container.Content, Position, New_Item));
++
++   --------------------
++   -- Constant_Range --
++   --------------------
++
++   function Constant_Range
++     (Container : Sequence;
++      Fst       : Index_Type;
++      Lst       : Extended_Index;
++      Item      : Element_Type) return Boolean is
++   begin
++      for I in Fst .. Lst loop
++         if Get (Container.Content, I) /= Item then
++            return False;
++         end if;
++      end loop;
++      return True;
++   end Constant_Range;
++
++   --------------
++   -- Contains --
++   --------------
++
++   function Contains
++     (Container : Sequence;
++      Fst       : Index_Type;
++      Lst       : Extended_Index;
++      Item      : Element_Type) return Boolean
+    is
+-     (Length (Result) = Length (S) + 1
+-       and then Get (Result, Index_Type'Val
+-                      ((Index_Type'Pos (Index_Type'First) - 1) +
+-                          Length (Result))) = E
+-      and then
+-        (for all M in Index_Type'First ..
+-           (Index_Type'Val
+-              ((Index_Type'Pos (Index_Type'First) - 1) + Length (S))) =>
+-                  Get (Result, M) = Get (S, M)));
++   begin
++      for I in Fst .. Lst loop
++         if Get (Container.Content, I) = Item then
++            return True;
++         end if;
++      end loop;
++      return False;
++   end Contains;
++
++   ------------------
++   -- Range_Except --
++   ------------------
++
++   function Equal_Except
++     (Left     : Sequence;
++      Right    : Sequence;
++      Position : Index_Type) return Boolean
++   is
++   begin
++      if Length (Left.Content) /= Length (Right.Content) then
++         return False;
++      end if;
++
++      for I in Index_Type'First .. Last (Left) loop
++         if I /= Position
++           and then Get (Left.Content, I) /= Get (Right.Content, I)
++         then
++            return False;
++         end if;
++      end loop;
++
++      return True;
++   end Equal_Except;
++
++   function Equal_Except
++     (Left  : Sequence;
++      Right : Sequence;
++      X, Y  : Index_Type) return Boolean
++   is
++   begin
++      if Length (Left.Content) /= Length (Right.Content) then
++         return False;
++      end if;
++
++      for I in Index_Type'First .. Last (Left) loop
++         if I /= X and then I /= Y
++           and then Get (Left.Content, I) /= Get (Right.Content, I)
++         then
++            return False;
++         end if;
++      end loop;
++
++      return True;
++   end Equal_Except;
+ 
+-   ------------
+-   -- Is_Set --
+-   ------------
++   ---------
++   -- Get --
++   ---------
+ 
+-   function Is_Set
+-     (S      : Sequence;
+-      N      : Index_Type;
+-      E      : Element_Type;
+-      Result : Sequence) return Boolean
++   function Get (Container : Sequence;
++                 Position  : Extended_Index) return Element_Type
+    is
+-     (N in Index_Type'First ..
+-             (Index_Type'Val
+-                  ((Index_Type'Pos (Index_Type'First) - 1) + Length (S)))
+-      and then Length (Result) = Length (S)
+-      and then Get (Result, N) = E
+-      and then
+-        (for all M in  Index_Type'First ..
+-             (Index_Type'Val
+-                  ((Index_Type'Pos (Index_Type'First) - 1) + Length (S))) =>
+-             (if M /= N then Get (Result, M) = Get (S, M))));
++     (Get (Container.Content, Position));
+ 
+    ----------
+    -- Last --
+    ----------
+ 
+-   function Last (S : Sequence) return Extended_Index is
+-     (Index_Type'Val ((Index_Type'Pos (Index_Type'First) - 1) + Length (S)));
++   function Last (Container : Sequence) return Extended_Index is
++     (Index_Type'Val ((Index_Type'Pos (Index_Type'First) - 1)
++                      + Length (Container)));
+ 
+    ------------
+    -- Length --
+    ------------
+ 
+-   function Length (S : Sequence) return Count_Type is
+-     (Length (S.Content));
++   function Length (Container : Sequence) return Count_Type is
++     (Length (Container.Content));
++
++   -----------------
++   -- Range_Equal --
++   -----------------
++
++   function Range_Equal
++     (Left  : Sequence;
++      Right : Sequence;
++      Fst   : Index_Type;
++      Lst   : Extended_Index) return Boolean
++   is
++   begin
++      for I in Fst .. Lst loop
++         if Get (Left, I) /= Get (Right, I) then
++            return False;
++         end if;
++      end loop;
++      return True;
++   end Range_Equal;
++
++   -------------------
++   -- Range_Shifted --
++   -------------------
++
++   function Range_Shifted
++     (Left   : Sequence;
++      Right  : Sequence;
++      Fst    : Index_Type;
++      Lst    : Extended_Index;
++      Offset : Count_Type'Base) return Boolean
++   is
++   begin
++      for I in Fst .. Lst loop
++         if Get (Left, I)
++           /= Get (Right, Index_Type'Val (Index_Type'Pos (I) + Offset))
++         then
++            return False;
++         end if;
++      end loop;
++      return True;
++   end Range_Shifted;
+ 
+    ------------
+    -- Remove --
+    ------------
+ 
+-   function Remove (S : Sequence; N : Index_Type) return Sequence is
+-     (Content => Remove (S.Content, N));
++   function Remove (Container : Sequence;
++                    Position : Index_Type) return Sequence
++   is
++     (Content => Remove (Container.Content, Position));
+ 
+    ---------
+    -- Set --
+    ---------
+ 
+    function Set
+-     (S : Sequence;
+-      N : Index_Type;
+-      E : Element_Type) return Sequence
++     (Container : Sequence;
++      Position  : Index_Type;
++      New_Item  : Element_Type) return Sequence
+    is
+-     (Content => Set (S.Content, N, E));
++     (Content => Set (Container.Content, Position, New_Item));
+ 
+ end Ada.Containers.Functional_Vectors;
+diff --git a/gcc/ada/a-cofuve.ads b/gcc/ada/a-cofuve.ads
+index 74f1bfb4220..ad359b41e10 100644
+--- a/gcc/ada/a-cofuve.ads
++++ b/gcc/ada/a-cofuve.ads
+@@ -38,12 +38,8 @@ generic
+    --  should have at least one more element at the low end than Index_Type.
+ 
+    type Element_Type (<>) is private;
+-   with function "=" (Left, Right : Element_Type) return Boolean is <>;
+-
+ package Ada.Containers.Functional_Vectors with SPARK_Mode is
+ 
+-   pragma Assertion_Policy (Post => Ignore);
+-
+    subtype Extended_Index is Index_Type'Base range
+      Index_Type'Pred (Index_Type'First) .. Index_Type'Last;
+    --  Index_Type with one more element at the low end of the range.
+@@ -60,178 +56,299 @@ package Ada.Containers.Functional_Vectors with SPARK_Mode is
+    --  Quantification over sequences can be done using the regular
+    --  quantification over its range or directly on its elements with "for of".
+ 
++   -----------------------
++   --  Basic operations --
++   -----------------------
++
+    --  Sequences are axiomatized using Length and Get, providing respectively
+    --  the length of a sequence and an accessor to its Nth element:
+ 
+-   function Length (S : Sequence) return Count_Type with
++   function Length (Container : Sequence) return Count_Type with
++   --  Length of a sequence
++
+      Global => null,
+      Post   =>
+        (Index_Type'Pos (Index_Type'First) - 1) + Length'Result <=
+           Index_Type'Pos (Index_Type'Last);
+ 
+-   function Last (S : Sequence) return Extended_Index with
++   function Get
++     (Container : Sequence;
++      Position  : Extended_Index) return Element_Type
++   --  Access the Element at position Position in Container
++
++   with
+      Global => null,
+-     Post   =>
++     Pre    => Position in Index_Type'First .. Last (Container);
++
++   function Last (Container : Sequence) return Extended_Index with
++   --  Last index of a sequence
++
++     Global => null,
++     Post =>
+        Last'Result =
+-         Index_Type'Val ((Index_Type'Pos (Index_Type'First) - 1) + Length (S));
++         Index_Type'Val ((Index_Type'Pos (Index_Type'First) - 1)
++                         + Length (Container));
++   pragma Annotate (GNATprove, Inline_For_Proof, Last);
+ 
+    function First return Extended_Index is (Index_Type'First);
++   --  First index of a sequence
+ 
+-   function Get (S : Sequence; N : Extended_Index) return Element_Type
+-   --  Get ranges over Extended_Index so that it can be used for iteration
++   ------------------------
++   -- Property Functions --
++   ------------------------
+ 
+-   with
+-     Global => null,
+-     Pre    => N in Index_Type'First .. Last (S);
+-
+-   function "=" (S1 : Sequence; S2 : Sequence) return Boolean with
++   function "=" (Left : Sequence; Right : Sequence) return Boolean with
+    --  Extensional equality over sequences
+ 
+      Global => null,
+      Post   =>
+        "="'Result =
+-         (Length (S1) = Length (S2)
+-            and then (for all N in Index_Type'First .. Last (S1) =>
+-                        Get (S1, N) = Get (S2, N)));
++         (Length (Left) = Length (Right)
++          and then (for all N in Index_Type'First .. Last (Left) =>
++              Get (Left, N) = Get (Right, N)));
++   pragma Annotate (GNATprove, Inline_For_Proof, "=");
+ 
+-   function "<" (S1 : Sequence; S2 : Sequence) return Boolean with
+-   --  S1 is a strict subsequence of S2
++   function "<" (Left : Sequence; Right : Sequence) return Boolean with
++   --  Left is a strict subsequence of Right
+ 
+      Global => null,
+      Post   =>
+        "<"'Result =
+-         (Length (S1) < Length (S2)
+-            and then (for all N in Index_Type'First .. Last (S1) =>
+-                        Get (S1, N) = Get (S2, N)));
++         (Length (Left) < Length (Right)
++          and then (for all N in Index_Type'First .. Last (Left) =>
++              Get (Left, N) = Get (Right, N)));
++   pragma Annotate (GNATprove, Inline_For_Proof, "<");
+ 
+-   function "<=" (S1 : Sequence; S2 : Sequence) return Boolean with
+-   --  S1 is a subsequence of S2
++   function "<=" (Left : Sequence; Right : Sequence) return Boolean with
++   --  Left is a subsequence of Right
+ 
+      Global => null,
+      Post   =>
+        "<="'Result =
+-         (Length (S1) <= Length (S2)
+-            and then (for all N in Index_Type'First .. Last (S1) =>
+-                        Get (S1, N) = Get (S2, N)));
+-
+-   function Is_Set
+-     (S      : Sequence;
+-      N      : Index_Type;
+-      E      : Element_Type;
+-      Result : Sequence) return Boolean
+-   --  Returns True if Result is S, where the Nth element has been replaced by
+-   --  E.
++         (Length (Left) <= Length (Right)
++          and then (for all N in Index_Type'First .. Last (Left) =>
++              Get (Left, N) = Get (Right, N)));
++   pragma Annotate (GNATprove, Inline_For_Proof, "<=");
++
++   function Contains
++     (Container : Sequence;
++      Fst       : Index_Type;
++      Lst       : Extended_Index;
++      Item      : Element_Type)
++         return Boolean
++   --  Returns True if Item occurs in the range from Fst to Lst of Container
+ 
+    with
+      Global => null,
++     Pre    => Lst <= Last (Container),
+      Post   =>
+-       Is_Set'Result =
+-         (N in Index_Type'First .. Last (S)
+-           and then Length (Result) = Length (S)
+-           and then Get (Result, N) = E
+-           and then (for all M in Index_Type'First .. Last (S) =>
+-                       (if M /= N then Get (Result, M) = Get (S, M))));
++       Contains'Result =
++         (for some I in Fst .. Lst => Get (Container, I) = Item);
++   pragma Annotate (GNATprove, Inline_For_Proof, Contains);
++
++   function Constant_Range
++     (Container : Sequence;
++      Fst       : Index_Type;
++      Lst       : Extended_Index;
++      Item      : Element_Type)
++         return Boolean
++   --  Returns True if every element of the range from Fst to Lst of Container
++   --  is equal to Item.
+ 
+-   function Set
+-     (S : Sequence;
+-      N : Index_Type;
+-      E : Element_Type) return Sequence
+-   --  Returns S, where the Nth element has been replaced by E.
+-   --  Is_Set (S, N, E, Result) should be used instead of
+-   --  Result = Set (S, N, E) whenever possible both for execution and for
+-   --  proof.
++   with
++     Global => null,
++     Pre    => Lst <= Last (Container),
++     Post   =>
++       Constant_Range'Result =
++         (for all I in Fst .. Lst => Get (Container, I) = Item);
++   pragma Annotate (GNATprove, Inline_For_Proof, Constant_Range);
++
++   function Equal_Except
++     (Left     : Sequence;
++      Right    : Sequence;
++      Position : Index_Type) return Boolean
++   --  Returns True is Left and Right are the same except at position Position
++
++   with
++     Global => null,
++     Pre    => Position <= Last (Left),
++     Post   =>
++       Equal_Except'Result =
++         (Length (Left) = Length (Right)
++          and then (for all I in Index_Type'First .. Last (Left) =>
++              (if I /= Position then Get (Left, I) = Get (Right, I))));
++   pragma Annotate (GNATprove, Inline_For_Proof, Equal_Except);
++
++   function Equal_Except
++     (Left  : Sequence;
++      Right : Sequence;
++      X, Y  : Index_Type) return Boolean
++   --  Returns True is Left and Right are the same except at positions X and Y
+ 
+    with
+      Global => null,
+-     Pre    => N in Index_Type'First .. Last (S),
+-     Post   => Is_Set (S, N, E, Set'Result);
++     Pre    => X <= Last (Left) and Y <= Last (Left),
++     Post   =>
++       Equal_Except'Result =
++         (Length (Left) = Length (Right)
++          and then (for all I in Index_Type'First .. Last (Left) =>
++              (if I /= X and I /= Y then Get (Left, I) = Get (Right, I))));
++   pragma Annotate (GNATprove, Inline_For_Proof, Equal_Except);
++
++   function Range_Equal
++     (Left  : Sequence;
++      Right : Sequence;
++      Fst   : Index_Type;
++      Lst   : Extended_Index) return Boolean
++   --  Returns True if the ranges from Fst to Lst contain the same elements in
++   --  Left and Right.
+ 
+-   function Is_Add
+-     (S      : Sequence;
+-      E      : Element_Type;
+-      Result : Sequence) return Boolean
+-   --  Returns True if Result is S appended with E
++   with
++     Global => null,
++     Pre    => Lst <= Last (Left) and Lst <= Last (Right),
++     Post   =>
++       Range_Equal'Result =
++         (for all I in Fst .. Lst => Get (Left, I) = Get (Right, I));
++   pragma Annotate (GNATprove, Inline_For_Proof, Range_Equal);
++
++   function Range_Shifted
++     (Left   : Sequence;
++      Right  : Sequence;
++      Fst    : Index_Type;
++      Lst    : Extended_Index;
++      Offset : Count_Type'Base) return Boolean
++   --  Returns True if the range from Fst to Lst in Left contains the same
++   --  elements as the range from Fst + Offset to Lst + Offset in Right.
+ 
+    with
+      Global => null,
++     Pre    => Lst <= Last (Left)
++           and Offset in
++              Index_Type'Pos (Index_Type'First) - Index_Type'Pos (Fst) ..
++                   (Index_Type'Pos (Index_Type'First) - 1)
++                  + Length (Right) - Index_Type'Pos (Lst),
+      Post   =>
+-       Is_Add'Result =
+-         (Length (Result) = Length (S) + 1
+-           and then Get (Result, Last (Result)) = E
+-           and then (for all M in Index_Type'First .. Last (S) =>
+-                       Get (Result, M) = Get (S, M)));
++       Range_Shifted'Result =
++         ((for all I in Fst .. Lst =>
++                   Get (Left, I)
++           = Get (Right, Index_Type'Val (Index_Type'Pos (I) + Offset)))
++          and
++            (for all I in Index_Type'Val (Index_Type'Pos (Fst) + Offset) ..
++               Index_Type'Val (Index_Type'Pos (Lst) + Offset) =>
++                 Get (Left, Index_Type'Val (Index_Type'Pos (I) - Offset))
++             = Get (Right, I)));
++   pragma Annotate (GNATprove, Inline_For_Proof, Range_Shifted);
++
++   ----------------------------
++   -- Construction Functions --
++   ----------------------------
++
++   --  For better efficiency of both proofs and execution, avoid using
++   --  construction functions in annotations and rather use property functions.
+ 
+-   function Add (S : Sequence; E : Element_Type) return Sequence with
+-   --  Returns S appended with E.
+-   --  Is_Add (S, E, Result) should be used instead of Result = Add (S, E)
+-   --  whenever possible both for execution and for proof.
++   function Set
++     (Container : Sequence;
++      Position  : Index_Type;
++      New_Item  : Element_Type) return Sequence
++   --  Returns a new sequence which contains the same elements as Container
++   --  except for the one at position Position which is replaced by New_Item.
+ 
++   with
+      Global => null,
+-     Pre    => Length (S) < Count_Type'Last and Last (S) < Index_Type'Last,
+-     Post   => Is_Add (S, E, Add'Result);
++     Pre    => Position in Index_Type'First .. Last (Container),
++     Post   => Get (Set'Result, Position) = New_Item
++     and then Equal_Except (Container, Set'Result, Position);
+ 
+-   function Insert
+-     (S : Sequence;
+-      N : Index_Type;
+-      E : Element_Type) return Sequence
++   function Add (Container : Sequence; New_Item : Element_Type) return Sequence
++   --  Returns a new sequence which contains the same elements as Container
++   --  plus New_Item at the end.
++
++   with
++     Global => null,
++     Pre    =>
++       Length (Container) < Count_Type'Last
++         and then Last (Container) < Index_Type'Last,
++     Post   =>
++       Length (Add'Result) = Length (Container) + 1
++         and then Get (Add'Result, Last (Add'Result)) = New_Item
++         and then Container <= Add'Result;
++
++   function Add
++     (Container : Sequence;
++      Position  : Index_Type;
++      New_Item  : Element_Type) return Sequence
+    with
+-   --  Returns S with E inserted at index I
++   --  Returns a new sequence which contains the same elements as Container
++   --  except that New_Item has been inserted at position Position.
+ 
+      Global => null,
+      Pre    =>
+-       Length (S) < Count_Type'Last
+-         and then Last (S) < Index_Type'Last
+-         and then N <= Extended_Index'Succ (Last (S)),
++       Length (Container) < Count_Type'Last
++         and then Last (Container) < Index_Type'Last
++         and then Position <= Extended_Index'Succ (Last (Container)),
+      Post   =>
+-       Length (Insert'Result) = Length (S) + 1
+-         and then Get (Insert'Result, N) = E
++       Length (Add'Result) = Length (Container) + 1
++         and then Get (Add'Result, Position) = New_Item
+          and then
+-           (for all M in Index_Type'First .. Extended_Index'Pred (N) =>
+-              Get (Insert'Result, M) = Get (S, M))
++            Range_Equal (Left  => Container,
++                         Right =>  Add'Result,
++                         Fst   => Index_Type'First,
++                         Lst   => Index_Type'Pred (Position))
+          and then
+-           (for all M in Extended_Index'Succ (N) ..  Last (Insert'Result) =>
+-              Get (Insert'Result, M) = Get (S, Extended_Index'Pred (M)))
+-         and then
+-           (for all M in N .. Last (S) =>
+-              Get (Insert'Result, Extended_Index'Succ (M)) = Get (S, M));
+-
+-   function Remove (S : Sequence; N : Index_Type) return Sequence with
+-   --  Returns S without the element at index N
++            Range_Shifted (Left   => Container,
++                           Right  => Add'Result,
++                           Fst    => Position,
++                           Lst    => Last (Container),
++                           Offset => 1);
++
++   function Remove
++     (Container : Sequence;
++      Position : Index_Type) return Sequence
++   --  Returns a new sequence which contains the same elements as Container
++   --  except that the element at position Position has been removed.
+ 
++   with
+      Global => null,
+      Pre    =>
+-       Length (S) < Count_Type'Last
+-         and Last (S) < Index_Type'Last
+-         and N in Index_Type'First .. Last (S),
++       Length (Container) < Count_Type'Last
++         and Last (Container) < Index_Type'Last
++         and Position in Index_Type'First .. Last (Container),
+      Post   =>
+-       Length (Remove'Result) = Length (S) - 1
+-         and then
+-           (for all M in Index_Type'First .. Extended_Index'Pred (N) =>
+-              Get (Remove'Result, M) = Get (S, M))
++       Length (Remove'Result) = Length (Container) - 1
+          and then
+-           (for all M in N .. Last (Remove'Result) =>
+-              Get (Remove'Result, M) = Get (S, Extended_Index'Succ (M)))
++            Range_Equal (Left  => Container,
++                         Right => Remove'Result,
++                         Fst   => Index_Type'First,
++                         Lst   => Index_Type'Pred (Position))
+          and then
+-           (for all M in Extended_Index'Succ (N) .. Last (S) =>
+-              Get (Remove'Result, Extended_Index'Pred (M)) = Get (S, M));
++            Range_Shifted (Left   => Remove'Result,
++                           Right  => Container,
++                           Fst    => Position,
++                           Lst    => Last (Remove'Result),
++                           Offset => 1);
+ 
+    ---------------------------
+    --  Iteration Primitives --
+    ---------------------------
+ 
+-   function Iter_First (S : Sequence) return Extended_Index with
++   function Iter_First (Container : Sequence) return Extended_Index with
+      Global => null;
+ 
+-   function Iter_Has_Element (S : Sequence; I : Extended_Index) return Boolean
++   function Iter_Has_Element
++     (Container : Sequence;
++      Position  : Extended_Index) return Boolean
+    with
+      Global => null,
+-     Post   => Iter_Has_Element'Result = (I in Index_Type'First .. Last (S));
++     Post   => Iter_Has_Element'Result =
++         (Position in Index_Type'First .. Last (Container));
+    pragma Annotate (GNATprove, Inline_For_Proof, Iter_Has_Element);
+ 
+-   function Iter_Next (S : Sequence; I : Extended_Index) return Extended_Index
++   function Iter_Next
++     (Container : Sequence;
++      Position  : Extended_Index) return Extended_Index
+    with
+      Global => null,
+-     Pre    => Iter_Has_Element (S, I);
++     Pre    => Iter_Has_Element (Container, Position);
+ 
+ private
+ 
+@@ -245,22 +362,21 @@ private
+       Content : Containers.Container;
+    end record;
+ 
+-   function Iter_First (S : Sequence) return Extended_Index is
++   function Iter_First (Container : Sequence) return Extended_Index is
+      (Index_Type'First);
+-
+    function Iter_Next
+-     (S : Sequence;
+-      I : Extended_Index) return Extended_Index
++     (Container : Sequence;
++      Position  : Extended_Index) return Extended_Index
+    is
+-     (if I = Extended_Index'Last then Extended_Index'First
+-      else Extended_Index'Succ (I));
++     (if Position = Extended_Index'Last then Extended_Index'First
++      else Extended_Index'Succ (Position));
+ 
+    function Iter_Has_Element
+-     (S : Sequence;
+-      I : Extended_Index) return Boolean
++     (Container : Sequence;
++      Position  : Extended_Index) return Boolean
+    is
+-     (I in Index_Type'First ..
+-       (Index_Type'Val
+-         ((Index_Type'Pos (Index_Type'First) - 1) + Length (S))));
++     (Position in Index_Type'First ..
++        (Index_Type'Val
++           ((Index_Type'Pos (Index_Type'First) - 1) + Length (Container))));
+ 
+ end Ada.Containers.Functional_Vectors;
+-- 
+2.21.0.windows.1
+

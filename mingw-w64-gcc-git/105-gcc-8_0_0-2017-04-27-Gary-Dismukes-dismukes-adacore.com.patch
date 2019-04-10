@@ -1,0 +1,49 @@
+From ee6fc6b2b33cb01e048d20fd20ed7cf60425b6ba Mon Sep 17 00:00:00 2001
+From: charlet <charlet@138bc75d-0d04-0410-961f-82ee72b054a4>
+Date: Thu, 27 Apr 2017 09:48:45 +0000
+Subject: [PATCH 2/5] 2017-04-27 Gary Dismukes <dismukes@adacore.com>
+
+	* exp_spark.adb, sem_elab.adb: Minor reformatting and typo fix.
+---
+ gcc/ada/exp_spark.adb | 4 ++--
+ gcc/ada/sem_elab.adb  | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/gcc/ada/exp_spark.adb b/gcc/ada/exp_spark.adb
+index 6eee24b65d1..abc79f3df94 100644
+--- a/gcc/ada/exp_spark.adb
++++ b/gcc/ada/exp_spark.adb
+@@ -54,7 +54,7 @@ package body Exp_SPARK is
+    --  System.Storage_Elements.To_Address
+ 
+    procedure Expand_SPARK_N_Object_Declaration (N : Node_Id);
+-   --  Perform object declaration-specific expansion
++   --  Perform object-declaration-specific expansion
+ 
+    procedure Expand_SPARK_N_Object_Renaming_Declaration (N : Node_Id);
+    --  Perform name evaluation for a renamed object
+@@ -86,7 +86,7 @@ package body Exp_SPARK is
+             Qualify_Entity_Names (N);
+ 
+          --  Replace occurrences of System'To_Address by calls to
+-         --  System.Storage_Elements.To_Address
++         --  System.Storage_Elements.To_Address.
+ 
+          when N_Attribute_Reference =>
+             Expand_SPARK_N_Attribute_Reference (N);
+diff --git a/gcc/ada/sem_elab.adb b/gcc/ada/sem_elab.adb
+index c78a1310553..676c1460161 100644
+--- a/gcc/ada/sem_elab.adb
++++ b/gcc/ada/sem_elab.adb
+@@ -688,7 +688,7 @@ package body Sem_Elab is
+       --  see whether an elaboration check is required.
+ 
+       Is_DIC : Boolean;
+-      --  Flag set when the subprogram being invoked the procedure generated
++      --  Flag set when the subprogram being invoked is the procedure generated
+       --  for pragma Default_Initial_Condition.
+ 
+       SPARK_Elab_Errors : Boolean;
+-- 
+2.21.0.windows.1
+

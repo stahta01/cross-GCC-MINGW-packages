@@ -1,0 +1,70 @@
+From dd9f9a3313b56faa0528b842c55964c9f4965bf3 Mon Sep 17 00:00:00 2001
+From: charlet <charlet@138bc75d-0d04-0410-961f-82ee72b054a4>
+Date: Thu, 27 Apr 2017 09:48:45 +0000
+Subject: [PATCH 3/5] 2017-04-27 Hristian Kirtchev <kirtchev@adacore.com>
+
+	* sem_res.adb (Resolve_Type_Conversion): Do not
+	install a predicate check here since this is already done during
+	the expansion phase. Verify whether the operand satisfies the
+	static predicate (if any) of the target type.
+	* sem_ch3.adb (Analyze_Object_Declaration): Do
+	not install a predicate check if the object is initialized by
+	means of a type conversion because the conversion is subjected
+	to the same check.
+---
+ gcc/ada/sem_ch3.adb |  8 ++++++++
+ gcc/ada/sem_res.adb | 17 +++--------------
+ 2 files changed, 11 insertions(+), 14 deletions(-)
+
+diff --git a/gcc/ada/sem_ch3.adb b/gcc/ada/sem_ch3.adb
+index 5379a856bd8..316457422e9 100644
+--- a/gcc/ada/sem_ch3.adb
++++ b/gcc/ada/sem_ch3.adb
+@@ -4195,6 +4195,14 @@ package body Sem_Ch3 is
+          if No (E) and then Is_Null_Record_Type (T) then
+             null;
+ 
++         --  Do not generate a predicate check if the initialization expression
++         --  is a type conversion because the conversion has been subjected to
++         --  the same check. This is a small optimization which avoid redundant
++         --  checks.
++
++         elsif Present (E) and then Nkind (E) = N_Type_Conversion then
++            null;
++
+          else
+             Insert_After (N,
+               Make_Predicate_Check (T, New_Occurrence_Of (Id, Loc)));
+diff --git a/gcc/ada/sem_res.adb b/gcc/ada/sem_res.adb
+index de5053c5158..0595b0b0835 100644
+--- a/gcc/ada/sem_res.adb
++++ b/gcc/ada/sem_res.adb
+@@ -11065,22 +11065,11 @@ package body Sem_Res is
+          end;
+       end if;
+ 
+-      --  Ada 2012: if target type has predicates, the result requires a
+-      --  predicate check. If the context is a call to another predicate
+-      --  check we must prevent infinite recursion.
++      --  Ada 2012: once the type conversion is resolved, check whether the
++      --  operand statisfies the static predicate of the target type.
+ 
+       if Has_Predicates (Target_Typ) then
+-         if Nkind (Parent (N)) = N_Function_Call
+-           and then Present (Name (Parent (N)))
+-           and then (Is_Predicate_Function (Entity (Name (Parent (N))))
+-                       or else
+-                     Is_Predicate_Function_M (Entity (Name (Parent (N)))))
+-         then
+-            null;
+-
+-         else
+-            Apply_Predicate_Check (N, Target_Typ);
+-         end if;
++         Check_Expression_Against_Static_Predicate (N, Target_Typ);
+       end if;
+ 
+       --  If at this stage we have a real to integer conversion, make sure that
+-- 
+2.21.0.windows.1
+
