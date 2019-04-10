@@ -1,7 +1,9 @@
 From b41953b5eda11421daa180b1e15ee36575959e86 Mon Sep 17 00:00:00 2001
 From: charlet <charlet@138bc75d-0d04-0410-961f-82ee72b054a4>
 Date: Thu, 27 Apr 2017 09:48:45 +0000
-Subject: [PATCH 4/5] 2017-04-27 Tristan Gingold <gingold@adacore.com>
+Subject: 2017-04-27 Tristan Gingold <gingold@adacore.com>
+
+Part of SVN 247301
 
 	* raise.c (__gnat_builtin_longjmp): Remove.
 	(__gnat_bracktrace):
