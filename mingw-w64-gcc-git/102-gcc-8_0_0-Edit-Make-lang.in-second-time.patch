@@ -1,7 +1,7 @@
 From 23474ca015bc4f21a7ba4b697afba4583baa250a Mon Sep 17 00:00:00 2001
 From: Tim S <tim.stahlhut@gmail.com>
 Date: Tue, 9 Apr 2019 19:57:53 -0400
-Subject: [PATCH 2/2] Edit Make-lang.in second time
+Subject: Change value of EH_MECHANISM
 
 Part of SVN 247339
 
