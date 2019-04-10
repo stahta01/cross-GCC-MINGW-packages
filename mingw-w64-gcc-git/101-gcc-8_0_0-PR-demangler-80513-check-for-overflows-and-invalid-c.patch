@@ -1,9 +1,9 @@
 From 79f0a8351da17efc1d8bd73b42d2a9caf6613437 Mon Sep 17 00:00:00 2001
 From: redi <redi@138bc75d-0d04-0410-961f-82ee72b054a4>
 Date: Thu, 27 Apr 2017 09:44:28 +0000
-Subject: PR demangler/80513 check for overflows and invalid characters in thunks
+Subject: PR demangler/80513 Part of SVN 247300
 
-Part of SVN 247300
+check for overflows and invalid characters in thunks
 
 	PR demangler/80513
 	* cp-demangle.c (d_number): Check for overflow.

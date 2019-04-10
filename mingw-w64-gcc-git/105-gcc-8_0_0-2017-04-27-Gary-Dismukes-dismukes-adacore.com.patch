@@ -1,9 +1,9 @@
 From ee6fc6b2b33cb01e048d20fd20ed7cf60425b6ba Mon Sep 17 00:00:00 2001
 From: charlet <charlet@138bc75d-0d04-0410-961f-82ee72b054a4>
 Date: Thu, 27 Apr 2017 09:48:45 +0000
-Subject: 2017-04-27 Gary Dismukes <dismukes@adacore.com>
+Subject: Part of SVN 247301
 
-Part of SVN 247301
+2017-04-27 Gary Dismukes <dismukes@adacore.com>
 
 	* exp_spark.adb, sem_elab.adb: Minor reformatting and typo fix.
 ---
@@ -47,5 +47,3 @@ index c78a1310553..676c1460161 100644
  
        SPARK_Elab_Errors : Boolean;
 -- 
-2.21.0.windows.1
-
