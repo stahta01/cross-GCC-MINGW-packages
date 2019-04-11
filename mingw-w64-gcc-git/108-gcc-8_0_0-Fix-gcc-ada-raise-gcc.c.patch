@@ -3,7 +3,7 @@ From: Tim S <tim.stahlhut@gmail.com>
 Date: Tue, 9 Apr 2019 08:16:18 -0400
 Subject: Fix gcc/ada/raise-gcc.c
 
-Combined parts of two later patch files SVN 247301 and 247309
+Combined parts of two later patch files SVN247301 and SVN247309
 into single patch.
 
 ---
