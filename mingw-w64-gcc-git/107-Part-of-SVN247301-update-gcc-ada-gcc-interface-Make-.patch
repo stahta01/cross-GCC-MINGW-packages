@@ -107,5 +107,3 @@ index eb0489b4a..10c865f45 100644
  	 $(ADA_INCLUDES) $< $(OUTPUT_OPTION)
  	@$(ADA_DEPS)
 -- 
-2.21.0.windows.1
-
