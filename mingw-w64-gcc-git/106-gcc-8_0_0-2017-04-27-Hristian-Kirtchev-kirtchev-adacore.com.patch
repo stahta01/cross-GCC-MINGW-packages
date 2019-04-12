@@ -1,0 +1,172 @@
+From 86f896dec2f3e5e586af98081d13cf1591de3067 Mon Sep 17 00:00:00 2001
+From: charlet <charlet@138bc75d-0d04-0410-961f-82ee72b054a4>
+Date: Thu, 27 Apr 2017 09:28:25 +0000
+Subject: Part of SVN247299
+
+2017-04-27  Tristan Gingold  <gingold@adacore.com>
+
+	* s-excmac-gcc.ads, s-excmac-gcc.adb,
+	s-excmac-arm.ads, s-excmac-arm.adb (New_Occurrence): Rewrite it in
+	Ada95.
+
+---
+ gcc/ada/s-excmac-arm.adb | 42 ++++++++++++++++++++++++++++++
+ gcc/ada/s-excmac-arm.ads | 10 ++------
+ gcc/ada/s-excmac-gcc.adb | 43 +++++++++++++++++++++++++++++++
+ gcc/ada/s-excmac-gcc.ads |  9 ++-----
+ create mode 100644 gcc/ada/s-excmac-arm.adb
+ create mode 100644 gcc/ada/s-excmac-gcc.adb
+
+diff --git a/gcc/ada/s-excmac-arm.adb b/gcc/ada/s-excmac-arm.adb
+new file mode 100644
+index 000000000..cfaa8535b
+--- /dev/null
++++ b/gcc/ada/s-excmac-arm.adb
+@@ -0,0 +1,42 @@
++------------------------------------------------------------------------------
++--                                                                          --
++--                         GNAT COMPILER COMPONENTS                         --
++--                                                                          --
++--              S Y S T E M . E X C E P T I O N S . M A C H I N E           --
++--                                                                          --
++--                                 B o d y                                  --
++--                                                                          --
++--            Copyright (C) 2013-2017, Free Software Foundation, Inc.       --
++--                                                                          --
++-- GNAT is free software;  you can  redistribute it  and/or modify it under --
++-- terms of the  GNU General Public License as published  by the Free Soft- --
++-- ware  Foundation;  either version 3,  or (at your option) any later ver- --
++-- sion.  GNAT is distributed in the hope that it will be useful, but WITH- --
++-- OUT ANY WARRANTY;  without even the  implied warranty of MERCHANTABILITY --
++-- or FITNESS FOR A PARTICULAR PURPOSE.                                     --
++--                                                                          --
++-- As a special exception under Section 7 of GPL version 3, you are granted --
++-- additional permissions described in the GCC Runtime Library Exception,   --
++-- version 3.1, as published by the Free Software Foundation.               --
++--                                                                          --
++-- You should have received a copy of the GNU General Public License and    --
++-- a copy of the GCC Runtime Library Exception along with this program;     --
++-- see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see    --
++-- <http://www.gnu.org/licenses/>.                                          --
++--                                                                          --
++-- GNAT was originally developed  by the GNAT team at  New York University. --
++-- Extensive contributions were provided by Ada Core Technologies Inc.      --
++--                                                                          --
++------------------------------------------------------------------------------
++
++package body System.Exceptions.Machine is
++   function New_Occurrence return GNAT_GCC_Exception_Access is
++      Res : GNAT_GCC_Exception_Access;
++   begin
++      Res := new GNAT_GCC_Exception;
++      Res.Header.Class := GNAT_Exception_Class;
++      Res.Header.Unwinder_Cache. Reserved1 := 0;
++      return Res;
++   end New_Occurrence;
++
++end System.Exceptions.Machine;
+diff --git a/gcc/ada/s-excmac-arm.ads b/gcc/ada/s-excmac-arm.ads
+index 88759b8e2..195d337db 100644
+--- a/gcc/ada/s-excmac-arm.ads
++++ b/gcc/ada/s-excmac-arm.ads
+@@ -6,7 +6,7 @@
+ --                                                                          --
+ --                                 S p e c                                  --
+ --                                                                          --
+---            Copyright (C) 2013, Free Software Foundation, Inc.            --
++--          Copyright (C) 2013-2017, Free Software Foundation, Inc.          --
+ --                                                                          --
+ -- GNAT is free software;  you can  redistribute it  and/or modify it under --
+ -- terms of the  GNU General Public License as published  by the Free Soft- --
+@@ -174,13 +174,7 @@ package System.Exceptions.Machine is
+      Ada.Unchecked_Conversion
+      (GCC_Exception_Access, GNAT_GCC_Exception_Access);
+ 
+-   function New_Occurrence return GNAT_GCC_Exception_Access is
+-      (new GNAT_GCC_Exception'
+-         (Header     => (Class   => GNAT_Exception_Class,
+-                         Unwinder_Cache => (Reserved1 => 0,
+-                                            others => <>),
+-                         others => <>),
+-          Occurrence => <>));
++   function New_Occurrence return GNAT_GCC_Exception_Access;
+    --  Allocate and initialize a machine occurrence
+ 
+ end System.Exceptions.Machine;
+diff --git a/gcc/ada/s-excmac-gcc.adb b/gcc/ada/s-excmac-gcc.adb
+new file mode 100644
+index 000000000..7d3965145
+--- /dev/null
++++ b/gcc/ada/s-excmac-gcc.adb
+@@ -0,0 +1,43 @@
++------------------------------------------------------------------------------
++--                                                                          --
++--                         GNAT COMPILER COMPONENTS                         --
++--                                                                          --
++--              S Y S T E M . E X C E P T I O N S . M A C H I N E           --
++--                                                                          --
++--                                 B o d y                                  --
++--                                                                          --
++--          Copyright (C) 2013-2017, Free Software Foundation, Inc.         --
++--                                                                          --
++-- GNAT is free software;  you can  redistribute it  and/or modify it under --
++-- terms of the  GNU General Public License as published  by the Free Soft- --
++-- ware  Foundation;  either version 3,  or (at your option) any later ver- --
++-- sion.  GNAT is distributed in the hope that it will be useful, but WITH- --
++-- OUT ANY WARRANTY;  without even the  implied warranty of MERCHANTABILITY --
++-- or FITNESS FOR A PARTICULAR PURPOSE.                                     --
++--                                                                          --
++-- As a special exception under Section 7 of GPL version 3, you are granted --
++-- additional permissions described in the GCC Runtime Library Exception,   --
++-- version 3.1, as published by the Free Software Foundation.               --
++--                                                                          --
++-- You should have received a copy of the GNU General Public License and    --
++-- a copy of the GCC Runtime Library Exception along with this program;     --
++-- see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see    --
++-- <http://www.gnu.org/licenses/>.                                          --
++--                                                                          --
++-- GNAT was originally developed  by the GNAT team at  New York University. --
++-- Extensive contributions were provided by Ada Core Technologies Inc.      --
++--                                                                          --
++------------------------------------------------------------------------------
++
++package body System.Exceptions.Machine is
++   function New_Occurrence return GNAT_GCC_Exception_Access is
++      Res : GNAT_GCC_Exception_Access;
++   begin
++      Res := new GNAT_GCC_Exception;
++      Res.Header := (Class   => GNAT_Exception_Class,
++                     Cleanup => Null_Address,
++                     others  => 0);
++      return Res;
++   end New_Occurrence;
++
++end System.Exceptions.Machine;
+diff --git a/gcc/ada/s-excmac-gcc.ads b/gcc/ada/s-excmac-gcc.ads
+index 1a7aba555..dabf8b68b 100644
+--- a/gcc/ada/s-excmac-gcc.ads
++++ b/gcc/ada/s-excmac-gcc.ads
+@@ -6,7 +6,7 @@
+ --                                                                          --
+ --                                 S p e c                                  --
+ --                                                                          --
+---          Copyright (C) 2013-2014, Free Software Foundation, Inc.         --
++--          Copyright (C) 2013-2017, Free Software Foundation, Inc.         --
+ --                                                                          --
+ -- GNAT is free software;  you can  redistribute it  and/or modify it under --
+ -- terms of the  GNU General Public License as published  by the Free Soft- --
+@@ -179,12 +179,7 @@ package System.Exceptions.Machine is
+      Ada.Unchecked_Conversion
+        (GCC_Exception_Access, GNAT_GCC_Exception_Access);
+ 
+-   function New_Occurrence return GNAT_GCC_Exception_Access is
+-      (new GNAT_GCC_Exception'
+-        (Header     => (Class   => GNAT_Exception_Class,
+-                        Cleanup => Null_Address,
+-                        others  => 0),
+-         Occurrence => <>));
++   function New_Occurrence return GNAT_GCC_Exception_Access;
+    --  Allocate and initialize a machine occurrence
+ 
+ end System.Exceptions.Machine;
+-- 
