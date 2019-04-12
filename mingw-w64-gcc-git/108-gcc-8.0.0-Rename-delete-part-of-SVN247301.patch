@@ -1,7 +1,9 @@
 From a666f1aaa1b8e2771ce4ace7f77c6db46b660250 Mon Sep 17 00:00:00 2001
 From: Tim S <tim.stahlhut@gmail.com>
 Date: Fri, 12 Apr 2019 00:41:40 -0400
-Subject: Rename/delete part of SVN247301
+Subject: Part E of SVN247301
+
+Delete/Rename files and update copyright date
 
 ---
  gcc/ada/a-except-2005.adb | 1748 -------------------------------------

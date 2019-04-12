@@ -1,7 +1,7 @@
-From aabce77f039368bfdfad55b721c2aa82411e7692 Mon Sep 17 00:00:00 2001
+From 7c0baa3c6516779bd2657ae8a479262a216c7a8b Mon Sep 17 00:00:00 2001
 From: Tim S <tim.stahlhut@gmail.com>
 Date: Fri, 12 Apr 2019 10:07:43 -0400
-Subject: Part of SVN247301 update gcc/ada/system.ads
+Subject: Part G of SVN247301 update gcc/ada/system.ads
 
 ---
  gcc/ada/system.ads | 8 ++++----

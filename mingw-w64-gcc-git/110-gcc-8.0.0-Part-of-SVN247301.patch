@@ -1,7 +1,7 @@
-From 0239f74d8b6644ee4709b45175ca797d4ca1e089 Mon Sep 17 00:00:00 2001
-From: charlet <charlet@138bc75d-0d04-0410-961f-82ee72b054a4>
-Date: Thu, 27 Apr 2017 09:48:45 +0000
-Subject: Part of SVN247301
+From e1f96906b9a448fac56e8e082b3397a0d7f059c9 Mon Sep 17 00:00:00 2001
+From: Tim S <tim.stahlhut@gmail.com>
+Date: Fri, 12 Apr 2019 10:06:57 -0400
+Subject: Part H of SVN247301
 
 2017-04-27 Tristan Gingold <gingold@adacore.com>
 
@@ -22,6 +22,8 @@ Subject: Part of SVN247301
 	* system.ads (Frontend_Exceptions): Set to False.
 	(ZCX_By_Default): Set to True.
 	(GCC_ZC_Support): Set to True.
+	* gcc-interface/Makefile.in: No more variants for a-exexpr.adb and
+	a-except.ad[sb].
 	* gcc-interface/Make-lang.in: Add support for backend zcx exceptions
 	in gnat1 and gnatbind.
 	* gnat1, gnatbind: link with raise-gcc.o, a-exctra.o, s-addima.o,
@@ -30,53 +32,16 @@ Subject: Part of SVN247301
 	* a-except.o: Adjust preequisites.
 	Add handling of s-excmac-arm.adb and s-excmac-gcc.adb.
 ---
- gcc/ada/a-except.adb               |  2 +-
- gcc/ada/a-except.ads               |  2 +-
- gcc/ada/gcc-interface/Make-lang.in | 34 ++++++++++++-
+ gcc/ada/gcc-interface/Make-lang.in |  6 +++
  gcc/ada/raise-gcc.c                | 29 +++++++----
  gcc/ada/raise.c                    | 81 ++++++++++++++++++++++++------
- gcc/ada/system.ads                 |  8 +--
+ 3 files changed, 91 insertions(+), 25 deletions(-)
 
-diff --git a/gcc/ada/a-except.adb b/gcc/ada/a-except.adb
-index a346494f6..1b8e625b5 100644
---- a/gcc/ada/a-except.adb
-+++ b/gcc/ada/a-except.adb
-@@ -6,7 +6,7 @@
- --                                                                          --
- --                                 B o d y                                  --
- --                                                                          --
----          Copyright (C) 1992-2015, Free Software Foundation, Inc.         --
-+--          Copyright (C) 1992-2017, Free Software Foundation, Inc.         --
- --                                                                          --
- -- GNAT is free software;  you can  redistribute it  and/or modify it under --
- -- terms of the  GNU General Public License as published  by the Free Soft- --
-diff --git a/gcc/ada/a-except.ads b/gcc/ada/a-except.ads
-index cb2b2976e..ff99e351a 100644
---- a/gcc/ada/a-except.ads
-+++ b/gcc/ada/a-except.ads
-@@ -6,7 +6,7 @@
- --                                                                          --
- --                                 S p e c                                  --
- --                                                                          --
----          Copyright (C) 1992-2015, Free Software Foundation, Inc.         --
-+--          Copyright (C) 1992-2017, Free Software Foundation, Inc.         --
- --                                                                          --
- -- This specification is derived from the Ada Reference Manual for use with --
- -- GNAT. The copyright notice above, and the license provisions that follow --
 diff --git a/gcc/ada/gcc-interface/Make-lang.in b/gcc/ada/gcc-interface/Make-lang.in
-index eb0489b4a..10c865f45 100644
+index 85e543c26..10c865f45 100644
 --- a/gcc/ada/gcc-interface/Make-lang.in
 +++ b/gcc/ada/gcc-interface/Make-lang.in
-@@ -99,6 +99,8 @@ ADA_TOOLS=gnatbind gnatchop gnat gnatkr gnatlink gnatls gnatmake \
- ada-warn = $(ADA_CFLAGS) $(filter-out -pedantic, $(STRICT_WARN))
- # Unresolved warnings in specific files.
- ada/adaint.o-warn = -Wno-error
-+# For unwind-pe.h
-+CFLAGS-ada/raise-gcc.o += -I$(srcdir)/../libgcc -Iinclude
- 
- ada/%.o: ada/gcc-interface/%.c
- 	$(COMPILE) $<
-@@ -223,6 +225,7 @@ GCC_LLINK=$(LLINKER) $(GCC_LINKERFLAGS) $(LDFLAGS)
+@@ -225,6 +225,7 @@ GCC_LLINK=$(LLINKER) $(GCC_LINKERFLAGS) $(LDFLAGS)
  # Object files for gnat1 from C sources.
  GNAT1_C_OBJS = ada/adadecode.o ada/adaint.o ada/argv.o ada/cio.o \
   ada/cstreams.o ada/env.o ada/init.o ada/initialize.o ada/raise.o \
@@ -84,35 +49,7 @@ index eb0489b4a..10c865f45 100644
   ada/seh_init.o ada/targext.o ada/cuintp.o ada/decl.o ada/rtfinal.o \
   ada/rtinit.o ada/misc.o ada/utils.o ada/utils2.o ada/trans.o ada/targtyps.o
  
-@@ -232,6 +235,7 @@ GNAT_ADA_OBJS =	\
-  ada/a-chlat1.o	\
-  ada/a-elchha.o	\
-  ada/a-except.o	\
-+ ada/a-exctra.o \
-  ada/a-ioexce.o	\
-  ada/ada.o	\
-  ada/spark_xrefs.o	\
-@@ -334,6 +338,7 @@ GNAT_ADA_OBJS =	\
-  ada/rident.o	\
-  ada/rtsfind.o	\
-  ada/s-addope.o	\
-+ ada/s-addima.o \
-  ada/s-assert.o	\
-  ada/s-bitops.o	\
-  ada/s-carun8.o	\
-@@ -351,9 +356,11 @@ GNAT_ADA_OBJS =	\
-  ada/s-excdeb.o	\
-  ada/s-except.o	\
-  ada/s-exctab.o	\
-+ ada/s-excmac.o \
-  ada/s-htable.o	\
-  ada/s-imenne.o	\
-  ada/s-imgenu.o	\
-+ ada/s-imgint.o \
-  ada/s-mastop.o	\
-  ada/s-memory.o	\
-  ada/s-os_lib.o	\
-@@ -372,7 +379,9 @@ GNAT_ADA_OBJS =	\
+@@ -378,7 +379,9 @@ GNAT_ADA_OBJS =	\
   ada/s-strhas.o	\
   ada/s-string.o	\
   ada/s-strops.o	\
@@ -122,15 +59,7 @@ index eb0489b4a..10c865f45 100644
   ada/s-unstyp.o	\
   ada/s-utf_32.o	\
   ada/s-valint.o	\
-@@ -381,6 +390,7 @@ GNAT_ADA_OBJS =	\
-  ada/s-wchcnv.o	\
-  ada/s-wchcon.o	\
-  ada/s-wchjis.o	\
-+ ada/s-wchstw.o \
-  ada/scans.o	\
-  ada/scil_ll.o	\
-  ada/scn.o	\
-@@ -514,6 +524,7 @@ GNATBIND_OBJS = \
+@@ -521,6 +524,7 @@ GNATBIND_OBJS = \
   ada/osint.o      \
   ada/output.o     \
   ada/raise.o      \
@@ -138,20 +67,7 @@ index eb0489b4a..10c865f45 100644
   ada/restrict.o   \
   ada/rident.o     \
   ada/rtfinal.o    \
-@@ -534,10 +545,12 @@ GNATBIND_OBJS = \
-  ada/s-crtl.o     \
-  ada/s-excdeb.o   \
-  ada/s-except.o   \
-+ ada/s-excmac.o   \
-  ada/s-exctab.o   \
-  ada/s-htable.o   \
-  ada/s-imenne.o   \
-  ada/s-imgenu.o   \
-+ ada/s-imgint.o   \
-  ada/s-mastop.o   \
-  ada/s-memory.o   \
-  ada/s-os_lib.o   \
-@@ -555,11 +568,13 @@ GNATBIND_OBJS = \
+@@ -564,11 +568,13 @@ GNATBIND_OBJS = \
   ada/s-string.o   \
   ada/s-strops.o   \
   ada/s-traent.o   \
@@ -165,43 +81,6 @@ index eb0489b4a..10c865f45 100644
   ada/scans.o      \
   ada/scil_ll.o    \
   ada/scng.o       \
-@@ -594,6 +609,21 @@ ADA_BACKEND = $(BACKEND) attribs.o
- # List of target dependent sources, overridden below as necessary
- TARGET_ADA_SRCS =
- 
-+# Select the right s-excmac according to exception layout (Itanium or arm)
-+host_cpu=$(word 1, $(subst -, ,$(host)))
-+EH_MECHANISM=-gcc
-+ifeq ($(strip $(filter-out arm%,$(host_cpu))),)
-+EH_MECHANISM=-arm
-+endif
-+
-+ada/s-excmac.o: ada/s-excmac.ads ada/s-excmac.adb
-+
-+ada/s-excmac.ads: $(srcdir)/ada/s-excmac$(EH_MECHANISM).ads
-+	$(CP) $< $@
-+
-+ada/s-excmac.adb: $(srcdir)/ada/s-excmac$(EH_MECHANISM).adb
-+	$(CP) $< $@
-+
- # Needs to be built with CC=gcc
- # Since the RTL should be built with the latest compiler, remove the
- #  stamp target in the parent directory whenever gnat1 is rebuilt
-@@ -976,12 +1006,12 @@ ada/sdefault.o : ada/ada.ads ada/a-except.ads ada/a-unccon.ads \
- 
- # Special flags - see gcc-interface/Makefile.in for the template.
- 
--ada/a-except.o  : ada/a-except.adb ada/a-except.ads
-+ada/a-except.o : ada/a-except.adb ada/a-except.ads ada/s-excmac.ads ada/s-excmac.adb
- 	$(CC) -c $(ALL_ADAFLAGS) $(FORCE_DEBUG_ADAFLAGS) -O1 -fno-inline \
- 	 $(ADA_INCLUDES) $< $(OUTPUT_OPTION)
- 	@$(ADA_DEPS)
- 
--ada/s-excdeb.o  : ada/s-excdeb.adb ada/s-excdeb.ads
-+ada/s-excdeb.o : ada/s-excdeb.adb ada/s-excdeb.ads
- 	$(CC) -c $(ALL_ADAFLAGS) $(FORCE_DEBUG_ADAFLAGS) -O0 \
- 	 $(ADA_INCLUDES) $< $(OUTPUT_OPTION)
- 	@$(ADA_DEPS)
 diff --git a/gcc/ada/raise-gcc.c b/gcc/ada/raise-gcc.c
 index 0074ad53f..cb35842b0 100644
 --- a/gcc/ada/raise-gcc.c
@@ -404,38 +283,4 @@ index a61723d10..8434b6729 100644
  #ifdef __cplusplus
  }
  #endif
-diff --git a/gcc/ada/system.ads b/gcc/ada/system.ads
-index bab3bd76e..c35ee7cab 100644
---- a/gcc/ada/system.ads
-+++ b/gcc/ada/system.ads
-@@ -7,7 +7,7 @@
- --                                 S p e c                                  --
- --                            (Compiler Version)                            --
- --                                                                          --
----          Copyright (C) 1992-2015, Free Software Foundation, Inc.         --
-+--          Copyright (C) 1992-2017, Free Software Foundation, Inc.         --
- --                                                                          --
- -- This specification is derived from the Ada Reference Manual for use with --
- -- GNAT. The copyright notice above, and the license provisions that follow --
-@@ -163,8 +163,8 @@ private
-    Always_Compatible_Rep     : constant Boolean := True;
-    Suppress_Standard_Library : constant Boolean := False;
-    Use_Ada_Main_Program_Name : constant Boolean := False;
--   Frontend_Exceptions       : constant Boolean := True;
--   ZCX_By_Default            : constant Boolean := False;
-+   Frontend_Exceptions       : constant Boolean := False;
-+   ZCX_By_Default            : constant Boolean := True;
- 
-    --  Obsolete entries, to be removed eventually (bootstrap issues)
- 
-@@ -173,6 +173,6 @@ private
-    Long_Shifts_Inlined       : constant Boolean := True;
-    Functions_Return_By_DSP   : constant Boolean := False;
-    Support_64_Bit_Divides    : constant Boolean := True;
--   GCC_ZCX_Support           : constant Boolean := False;
-+   GCC_ZCX_Support           : constant Boolean := True;
- 
- end System;
 -- 
-2.21.0.windows.1
-

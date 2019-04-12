@@ -1,7 +1,7 @@
 From 63d369ead25843c05db8d3796da730e4ff3baccc Mon Sep 17 00:00:00 2001
 From: Tim S <tim.stahlhut@gmail.com>
 Date: Fri, 12 Apr 2019 10:06:57 -0400
-Subject: Part of SVN247301 update gcc/ada/gcc-interface/Make-lang.in
+Subject: Part D of SVN247301 update gcc/ada/gcc-interface/Make-lang.in
 
 ---
  gcc/ada/gcc-interface/Make-lang.in | 34 ++++++++++++++++++++++++++++--
