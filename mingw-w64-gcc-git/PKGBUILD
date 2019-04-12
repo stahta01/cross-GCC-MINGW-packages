@@ -47,7 +47,7 @@ _commit=5bcff344383e1499e88044a713cac6a3eaaddb98 # SVN 247298   No build error
 #                                  with patch 101               No build error
 #                   with patches 101,102, and 103               No build error
 #                   with patches 101-104, and 105               No build error
-#               with patches 101-105,106, and 107               raise-gcc.c:36:2: error: #error "RTS unit only"
+#               with patches 101-105,106, and 107
 #           with patches 101-105,106,107, and 108
 #       with patches 101-105,106,107,108, and 109
 #   with patches 101-105,106,107,108,109,110, and 111
