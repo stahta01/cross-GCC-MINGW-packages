@@ -1,4 +1,4 @@
-From 86f896dec2f3e5e586af98081d13cf1591de3067 Mon Sep 17 00:00:00 2001
+From 0e18c72c85842c55a91db7fc67cd7795c8017af6 Mon Sep 17 00:00:00 2001
 From: charlet <charlet@138bc75d-0d04-0410-961f-82ee72b054a4>
 Date: Thu, 27 Apr 2017 09:28:25 +0000
 Subject: Part B of SVN247299
@@ -8,18 +8,18 @@ Subject: Part B of SVN247299
 	* s-excmac-gcc.ads, s-excmac-gcc.adb,
 	s-excmac-arm.ads, s-excmac-arm.adb (New_Occurrence): Rewrite it in
 	Ada95.
-
 ---
- gcc/ada/s-excmac-arm.adb | 42 ++++++++++++++++++++++++++++++
- gcc/ada/s-excmac-arm.ads | 10 ++------
- gcc/ada/s-excmac-gcc.adb | 43 +++++++++++++++++++++++++++++++
- gcc/ada/s-excmac-gcc.ads |  9 ++-----
+ gcc/ada/s-excmac-arm.adb | 42 +++++++++++++++++++++++++++++++++++++++
+ gcc/ada/s-excmac-arm.ads | 10 ++--------
+ gcc/ada/s-excmac-gcc.adb | 43 ++++++++++++++++++++++++++++++++++++++++
+ gcc/ada/s-excmac-gcc.ads |  9 ++-------
+ 4 files changed, 89 insertions(+), 15 deletions(-)
  create mode 100644 gcc/ada/s-excmac-arm.adb
  create mode 100644 gcc/ada/s-excmac-gcc.adb
 
 diff --git a/gcc/ada/s-excmac-arm.adb b/gcc/ada/s-excmac-arm.adb
 new file mode 100644
-index 000000000..cfaa8535b
+index 00000000000..cfaa8535b38
 --- /dev/null
 +++ b/gcc/ada/s-excmac-arm.adb
 @@ -0,0 +1,42 @@
@@ -66,7 +66,7 @@ index 000000000..cfaa8535b
 +
 +end System.Exceptions.Machine;
 diff --git a/gcc/ada/s-excmac-arm.ads b/gcc/ada/s-excmac-arm.ads
-index 88759b8e2..195d337db 100644
+index 88759b8e228..195d337db1b 100644
 --- a/gcc/ada/s-excmac-arm.ads
 +++ b/gcc/ada/s-excmac-arm.ads
 @@ -6,7 +6,7 @@
@@ -95,7 +95,7 @@ index 88759b8e2..195d337db 100644
  end System.Exceptions.Machine;
 diff --git a/gcc/ada/s-excmac-gcc.adb b/gcc/ada/s-excmac-gcc.adb
 new file mode 100644
-index 000000000..7d3965145
+index 00000000000..7d396514512
 --- /dev/null
 +++ b/gcc/ada/s-excmac-gcc.adb
 @@ -0,0 +1,43 @@
@@ -143,7 +143,7 @@ index 000000000..7d3965145
 +
 +end System.Exceptions.Machine;
 diff --git a/gcc/ada/s-excmac-gcc.ads b/gcc/ada/s-excmac-gcc.ads
-index 1a7aba555..dabf8b68b 100644
+index 1a7aba55531..dabf8b68b74 100644
 --- a/gcc/ada/s-excmac-gcc.ads
 +++ b/gcc/ada/s-excmac-gcc.ads
 @@ -6,7 +6,7 @@

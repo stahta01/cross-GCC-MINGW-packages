@@ -1,4 +1,4 @@
-From 7c0baa3c6516779bd2657ae8a479262a216c7a8b Mon Sep 17 00:00:00 2001
+From c514ac156205897e126486c94d481b35ba64db4b Mon Sep 17 00:00:00 2001
 From: Tim S <tim.stahlhut@gmail.com>
 Date: Fri, 12 Apr 2019 10:07:43 -0400
 Subject: Part G of SVN247301 update gcc/ada/system.ads
@@ -8,7 +8,7 @@ Subject: Part G of SVN247301 update gcc/ada/system.ads
  1 file changed, 4 insertions(+), 4 deletions(-)
 
 diff --git a/gcc/ada/system.ads b/gcc/ada/system.ads
-index bab3bd76e..c35ee7cab 100644
+index bab3bd76e85..c35ee7cab27 100644
 --- a/gcc/ada/system.ads
 +++ b/gcc/ada/system.ads
 @@ -7,7 +7,7 @@

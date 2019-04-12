@@ -1,4 +1,4 @@
-From e1f96906b9a448fac56e8e082b3397a0d7f059c9 Mon Sep 17 00:00:00 2001
+From 64fb3c4a093ba1c87fc804d9497c79bc2a4a753a Mon Sep 17 00:00:00 2001
 From: Tim S <tim.stahlhut@gmail.com>
 Date: Fri, 12 Apr 2019 10:06:57 -0400
 Subject: Part H of SVN247301
@@ -38,7 +38,7 @@ Subject: Part H of SVN247301
  3 files changed, 91 insertions(+), 25 deletions(-)
 
 diff --git a/gcc/ada/gcc-interface/Make-lang.in b/gcc/ada/gcc-interface/Make-lang.in
-index 85e543c26..10c865f45 100644
+index 85e543c26b2..10c865f457d 100644
 --- a/gcc/ada/gcc-interface/Make-lang.in
 +++ b/gcc/ada/gcc-interface/Make-lang.in
 @@ -225,6 +225,7 @@ GCC_LLINK=$(LLINKER) $(GCC_LINKERFLAGS) $(LDFLAGS)
@@ -82,7 +82,7 @@ index 85e543c26..10c865f45 100644
   ada/scil_ll.o    \
   ada/scng.o       \
 diff --git a/gcc/ada/raise-gcc.c b/gcc/ada/raise-gcc.c
-index 0074ad53f..cb35842b0 100644
+index 0074ad53fbc..cb35842b061 100644
 --- a/gcc/ada/raise-gcc.c
 +++ b/gcc/ada/raise-gcc.c
 @@ -6,7 +6,7 @@
@@ -178,7 +178,7 @@ index 0074ad53f..cb35842b0 100644
 +}
 +#endif
 diff --git a/gcc/ada/raise.c b/gcc/ada/raise.c
-index a61723d10..8434b6729 100644
+index a61723d10e4..8434b67293d 100644
 --- a/gcc/ada/raise.c
 +++ b/gcc/ada/raise.c
 @@ -6,7 +6,7 @@

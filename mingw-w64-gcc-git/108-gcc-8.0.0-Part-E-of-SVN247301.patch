@@ -1,4 +1,4 @@
-From 8b53e2348637d145a0508a78735e07144edaee95 Mon Sep 17 00:00:00 2001
+From 8a8e66838d022324ebe583803c17f3c39afa03ab Mon Sep 17 00:00:00 2001
 From: Tim S <tim.stahlhut@gmail.com>
 Date: Fri, 12 Apr 2019 00:41:40 -0400
 Subject: Part E of SVN247301
@@ -18,7 +18,7 @@ Delete/Rename files and update copyright date
 
 diff --git a/gcc/ada/a-except-2005.adb b/gcc/ada/a-except-2005.adb
 deleted file mode 100644
-index a346494f6..000000000
+index a346494f6c4..00000000000
 --- a/gcc/ada/a-except-2005.adb
 +++ /dev/null
 @@ -1,1748 +0,0 @@
@@ -1772,7 +1772,7 @@ index a346494f6..000000000
 -end Ada.Exceptions;
 diff --git a/gcc/ada/a-except-2005.ads b/gcc/ada/a-except-2005.ads
 deleted file mode 100644
-index cb2b2976e..000000000
+index cb2b2976e4a..00000000000
 --- a/gcc/ada/a-except-2005.ads
 +++ /dev/null
 @@ -1,349 +0,0 @@
@@ -2126,7 +2126,7 @@ index cb2b2976e..000000000
 -
 -end Ada.Exceptions;
 diff --git a/gcc/ada/a-except.adb b/gcc/ada/a-except.adb
-index 3b9caeadf..1b8e625b5 100644
+index 3b9caeadf8d..1b8e625b51e 100644
 --- a/gcc/ada/a-except.adb
 +++ b/gcc/ada/a-except.adb
 @@ -6,7 +6,7 @@
@@ -3764,7 +3764,7 @@ index 3b9caeadf..1b8e625b5 100644
 +
  end Ada.Exceptions;
 diff --git a/gcc/ada/a-except.ads b/gcc/ada/a-except.ads
-index 79ca6c855..ff99e351a 100644
+index 79ca6c8558b..ff99e351ab6 100644
 --- a/gcc/ada/a-except.ads
 +++ b/gcc/ada/a-except.ads
 @@ -6,7 +6,7 @@
@@ -3945,7 +3945,7 @@ index 79ca6c855..ff99e351a 100644
  end Ada.Exceptions;
 diff --git a/gcc/ada/a-exexpr-gcc.adb b/gcc/ada/a-exexpr-gcc.adb
 deleted file mode 100644
-index 91fb5f5cd..000000000
+index 91fb5f5cd67..00000000000
 --- a/gcc/ada/a-exexpr-gcc.adb
 +++ /dev/null
 @@ -1,439 +0,0 @@
@@ -4389,7 +4389,7 @@ index 91fb5f5cd..000000000
 -
 -end Exception_Propagation;
 diff --git a/gcc/ada/a-exexpr.adb b/gcc/ada/a-exexpr.adb
-index e2fd7d70e..91fb5f5cd 100644
+index e2fd7d70e1e..91fb5f5cd67 100644
 --- a/gcc/ada/a-exexpr.adb
 +++ b/gcc/ada/a-exexpr.adb
 @@ -6,7 +6,7 @@

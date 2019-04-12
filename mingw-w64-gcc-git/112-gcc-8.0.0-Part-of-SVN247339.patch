@@ -1,10 +1,11 @@
-From cc266a6c28f7b78473c15ec46047bb7a9bcf414a Mon Sep 17 00:00:00 2001
+From 61e864e668476920847baf3c3b1538dfaa9f0868 Mon Sep 17 00:00:00 2001
 From: Tim S <tim.stahlhut@gmail.com>
 Date: Tue, 9 Apr 2019 08:16:18 -0400
 Subject: Part of SVN247339
 
 ---
- gcc/ada/gcc-interface/Make-lang.in | 13 ++++++-----
+ gcc/ada/gcc-interface/Make-lang.in | 13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
 
 diff --git a/gcc/ada/gcc-interface/Make-lang.in b/gcc/ada/gcc-interface/Make-lang.in
 index 10c865f457d..fa04e80a52d 100644
