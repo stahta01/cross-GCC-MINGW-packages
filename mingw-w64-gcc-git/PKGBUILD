@@ -13,7 +13,7 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}-git"
          "${MINGW_PACKAGE_PREFIX}-${_realname}-fortran-git"
          "${MINGW_PACKAGE_PREFIX}-${_realname}-ada-git"
          "${MINGW_PACKAGE_PREFIX}-${_realname}-objc-git")
-pkgver=8.0.0.d20170427.c13.g5bcff344383
+pkgver=8.0.0.d20170427.c15.g5bcff344383
 pkgrel=1
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
@@ -45,7 +45,7 @@ options=('staticlibs' '!emptydirs' '!strip' 'debug')
 
 _commit=5bcff344383e1499e88044a713cac6a3eaaddb98 # SVN 247298   No build error
 #                                  with patch 101               No build error
-#                   with patches 101,102, and 103
+#                   with patches 101,102, and 103               No build error
 #            with patches 101,102,103,104 and 105
 #    with patches 101,102,103,104,105,107 and 108
 #_commit=375af1938058a2534ff52c5b8fd9f49e80232b00 # SVN 247299  cannot generate code for file s-excmac.ads
@@ -91,13 +91,13 @@ sha256sums=('SKIP'
             'b1c3c20bf501cebbcb02b4a50f117a4f90eb4fb79eac7aa99c85e2c54c106790'
             '33392651e17b81609718873ff32606deee5f3fc5176c197bb96eedc3dada8912'
             'bf83cbc79de4c86f02664c8a624e26b12f570e3c31116fc7c46ecf655696f9a6'
-            'f5dd0b3ea4e18d0a2ea251257554b8cef1f8f17d9ab40e9573b5461be18ec2f4'
-            '591137ac4b62e192df10c2002575a19390ff2a4db4b0f5ba3da35c5cd2a515ab'
-            '3a329f6182595d65f1a1f131ffac6d71bb80ae492c12338a277bdc731b92f28a'
-            '6fb23647d497696412186bbfcfb6699340409f98c766dfed26e5e8eefc3ed8bc'
-            'd89810ba7e87251900d67d237d4729b60de5ab226a590baa5c235773a78203f9'
-            'c79d3e0b7f5726beb83388444e859ec466bf0f59f4196aee00e99991c68b511f'
-            'fdbce8de4c1e114c408e1c9430c5408ac447db99ca0371da8f431d540743139e')
+            '37ca4334938e44f32d719cf9970b1e4d77036180369d995fbe0e656ef8df54f9'
+            'dc1bd5bb1d773038419fa28f2734fb87b32b1c681ff6306c7b5fb4e9188e7ca7'
+            '756a22cda08cdeb7e222cd369f960a2b3135500e7f284a7f1ea3f53416e7dc93'
+            'a1490c1553a1d6fb37b4a5451a1ece99af375e78723144663a91f3d706990e12'
+            'faf9b6211f6053842fab68010bcc4980809c9a387ff07f72274107447ece6194'
+            '7162b422d6744be97ab0622cbf6568939daf13ce951fc62543cf0641cfcd3e31'
+            '2c80e11a7f6835975d126e9b8514131e32f44e895ea28d7a034c877fe7bf8d84')
 
 _threads="posix"
 
@@ -136,8 +136,8 @@ prepare() {
   ${GIT_AM} ${srcdir}/101-gcc-8_0_0-PR-demangler-80513-check-for-overflows-and-invalid-c.patch
   ${GIT_AM} ${srcdir}/102-gcc-8_0_0-2017-04-27-Hristian-Kirtchev-kirtchev-adacore.com.patch
   ${GIT_AM} ${srcdir}/103-gcc-8_0_0-2017-04-27-Hristian-Kirtchev-kirtchev-adacore.com.patch
-  #${GIT_AM} ${srcdir}/104-gcc-8_0_0-2017-04-27-Claire-Dross-dross-adacore.com.patch
-  #${GIT_AM} ${srcdir}/105-gcc-8_0_0-2017-04-27-Gary-Dismukes-dismukes-adacore.com.patch
+  ${GIT_AM} ${srcdir}/104-gcc-8_0_0-2017-04-27-Claire-Dross-dross-adacore.com.patch
+  ${GIT_AM} ${srcdir}/105-gcc-8_0_0-2017-04-27-Gary-Dismukes-dismukes-adacore.com.patch
 
   #${GIT_AM} ${srcdir}/107-gcc-8_0_0-2017-04-27-Tristan-Gingold-gingold-adacore.com.patch
   #${GIT_AM} ${srcdir}/108-gcc-8_0_0-Fix-gcc-ada-raise-gcc.c.patch
