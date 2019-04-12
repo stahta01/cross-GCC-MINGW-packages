@@ -81,7 +81,8 @@ source=(${_realname}-git::"git://gcc.gnu.org/git/gcc.git#commit=${_commit}"
         107-Part-of-SVN247301-update-gcc-ada-gcc-interface-Make-.patch
         108-gcc-8.0.0-Rename-delete-part-of-SVN247301.patch
         109-gcc-8.0.0-Part-of-SVN247301.patch
-        111-gcc-8.0.0-Fix-gcc-ada-raise-gcc_c.patch)
+        111-gcc-8.0.0-Fix-gcc-ada-raise-gcc_c.patch
+        112-gcc-8.0.0-Fix-gcc-ada-raise-gcc_c.patch)
 sha256sums=('SKIP'
             '83e9c6f76f728ae3e2f2eabb588b0d6cea7a3eda03cd5e77aed9d613143b7348'
             '6033acda690786397059536787a6577e1a9f2b39f8a66276821917066094f43c'
@@ -106,7 +107,8 @@ sha256sums=('SKIP'
             '4822fba068456868f51df6aacef36d3910b790b0f940ca1c1d2d113dc3dd5293'
             'b3186d907a7c9e8847b3abba9b6fdf48d8ef19ec9a459ba46011e8f34a38956c'
             'b2686de589099b9179465b9a547e0a8bb10605165e76f27482364527de5f5e7a'
-            'f2464e91d6a829f7a1bfc092b90a48e675dd7c58ac9f62bb6cedb618670fd667')
+            'f2464e91d6a829f7a1bfc092b90a48e675dd7c58ac9f62bb6cedb618670fd667'
+            '')
 
 _threads="posix"
 
@@ -153,6 +155,7 @@ prepare() {
 
   #${GIT_AM} ${srcdir}/109-gcc-8.0.0-Part-of-SVN247301.patch
   #${GIT_AM} ${srcdir}/111-gcc-8.0.0-Fix-gcc-ada-raise-gcc_c.patch
+  #${GIT_AM} ${srcdir}/112-gcc-8.0.0-Fix-gcc-ada-raise-gcc_c.patch
 
 
   # do not expect $prefix/mingw symlink - this should be superceded by
