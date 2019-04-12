@@ -1,18 +1,17 @@
-From a666f1aaa1b8e2771ce4ace7f77c6db46b660250 Mon Sep 17 00:00:00 2001
+From 8b53e2348637d145a0508a78735e07144edaee95 Mon Sep 17 00:00:00 2001
 From: Tim S <tim.stahlhut@gmail.com>
 Date: Fri, 12 Apr 2019 00:41:40 -0400
 Subject: Part E of SVN247301
 
 Delete/Rename files and update copyright date
-
 ---
  gcc/ada/a-except-2005.adb | 1748 -------------------------------------
  gcc/ada/a-except-2005.ads |  349 --------
- gcc/ada/a-except.adb      | 1068 +++++++++++-----------
- gcc/ada/a-except.ads      |   95 +-
+ gcc/ada/a-except.adb      | 1070 ++++++++++++-----------
+ gcc/ada/a-except.ads      |   97 +-
  gcc/ada/a-exexpr-gcc.adb  |  439 ----------
  gcc/ada/a-exexpr.adb      |  410 ++++++++-
- 6 files changed, 1022 insertions(+), 3087 deletions(-)
+ 6 files changed, 1024 insertions(+), 3089 deletions(-)
  delete mode 100644 gcc/ada/a-except-2005.adb
  delete mode 100644 gcc/ada/a-except-2005.ads
  delete mode 100644 gcc/ada/a-exexpr-gcc.adb
@@ -2127,9 +2126,18 @@ index cb2b2976e..000000000
 -
 -end Ada.Exceptions;
 diff --git a/gcc/ada/a-except.adb b/gcc/ada/a-except.adb
-index 3b9caeadf..a346494f6 100644
+index 3b9caeadf..1b8e625b5 100644
 --- a/gcc/ada/a-except.adb
 +++ b/gcc/ada/a-except.adb
+@@ -6,7 +6,7 @@
+ --                                                                          --
+ --                                 B o d y                                  --
+ --                                                                          --
+---          Copyright (C) 1992-2015, Free Software Foundation, Inc.         --
++--          Copyright (C) 1992-2017, Free Software Foundation, Inc.         --
+ --                                                                          --
+ -- GNAT is free software;  you can  redistribute it  and/or modify it under --
+ -- terms of the  GNU General Public License as published  by the Free Soft- --
 @@ -29,8 +29,6 @@
  --                                                                          --
  ------------------------------------------------------------------------------
@@ -3756,9 +3764,18 @@ index 3b9caeadf..a346494f6 100644
 +
  end Ada.Exceptions;
 diff --git a/gcc/ada/a-except.ads b/gcc/ada/a-except.ads
-index 79ca6c855..cb2b2976e 100644
+index 79ca6c855..ff99e351a 100644
 --- a/gcc/ada/a-except.ads
 +++ b/gcc/ada/a-except.ads
+@@ -6,7 +6,7 @@
+ --                                                                          --
+ --                                 S p e c                                  --
+ --                                                                          --
+---          Copyright (C) 1992-2015, Free Software Foundation, Inc.         --
++--          Copyright (C) 1992-2017, Free Software Foundation, Inc.         --
+ --                                                                          --
+ -- This specification is derived from the Ada Reference Manual for use with --
+ -- GNAT. The copyright notice above, and the license provisions that follow --
 @@ -33,24 +33,15 @@
  --                                                                          --
  ------------------------------------------------------------------------------
@@ -4831,5 +4848,3 @@ index e2fd7d70e..91fb5f5cd 100644
  
  end Exception_Propagation;
 -- 
-2.21.0.windows.1
-
