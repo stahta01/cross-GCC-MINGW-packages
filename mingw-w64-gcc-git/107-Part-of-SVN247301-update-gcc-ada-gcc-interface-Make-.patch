@@ -20,14 +20,6 @@ index eb0489b4a..10c865f45 100644
  
  ada/%.o: ada/gcc-interface/%.c
  	$(COMPILE) $<
-@@ -223,6 +225,7 @@ GCC_LLINK=$(LLINKER) $(GCC_LINKERFLAGS) $(LDFLAGS)
- # Object files for gnat1 from C sources.
- GNAT1_C_OBJS = ada/adadecode.o ada/adaint.o ada/argv.o ada/cio.o \
-  ada/cstreams.o ada/env.o ada/init.o ada/initialize.o ada/raise.o \
-+ ada/raise-gcc.o \
-  ada/seh_init.o ada/targext.o ada/cuintp.o ada/decl.o ada/rtfinal.o \
-  ada/rtinit.o ada/misc.o ada/utils.o ada/utils2.o ada/trans.o ada/targtyps.o
- 
 @@ -232,6 +235,7 @@ GNAT_ADA_OBJS =	\
   ada/a-chlat1.o	\
   ada/a-elchha.o	\
@@ -74,14 +66,6 @@ index eb0489b4a..10c865f45 100644
   ada/scans.o	\
   ada/scil_ll.o	\
   ada/scn.o	\
-@@ -514,6 +524,7 @@ GNATBIND_OBJS = \
-  ada/osint.o      \
-  ada/output.o     \
-  ada/raise.o      \
-+ ada/raise-gcc.o  \
-  ada/restrict.o   \
-  ada/rident.o     \
-  ada/rtfinal.o    \
 @@ -534,10 +545,12 @@ GNATBIND_OBJS = \
   ada/s-crtl.o     \
   ada/s-excdeb.o   \
