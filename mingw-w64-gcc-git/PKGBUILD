@@ -13,7 +13,7 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}-git"
          "${MINGW_PACKAGE_PREFIX}-${_realname}-fortran-git"
          "${MINGW_PACKAGE_PREFIX}-${_realname}-ada-git"
          "${MINGW_PACKAGE_PREFIX}-${_realname}-objc-git")
-pkgver=8.0.0.d20170427.c18.g5bcff344383
+pkgver=8.0.0.d20170427.c17.g5bcff344383
 pkgrel=1
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
@@ -47,7 +47,7 @@ _commit=5bcff344383e1499e88044a713cac6a3eaaddb98 # SVN 247298   No build error
 #                                  with patch 101               No build error
 #                   with patches 101,102, and 103               No build error
 #            with patches 101,102,103,104 and 105               No build error
-#     with patches 101,102,103,104,105/7, and 108               Failed needs 106
+#              with patches 101-105,1066, and 107
 #   with patches 101,102,103,104,105/6/7, and 108
 # with patches 101,102,103,104,105/6/7/8/9 and 111
 #_commit=375af1938058a2534ff52c5b8fd9f49e80232b00 # SVN 247299  cannot generate code for file s-excmac.ads
@@ -77,8 +77,8 @@ source=(${_realname}-git::"git://gcc.gnu.org/git/gcc.git#commit=${_commit}"
         104-gcc-8_0_0-2017-04-27-Claire-Dross-dross-adacore.com.patch
         105-gcc-8_0_0-2017-04-27-Gary-Dismukes-dismukes-adacore.com.patch
         106-gcc-8_0_0-2017-04-27-Hristian-Kirtchev-kirtchev-adacore.com.patch
-        107-gcc-8.0.0-Rename-delete-part-of-SVN247301.patch
-        108-gcc-8.0.0-Part-of-SVN247301.patch
+        107-Part-of-SVN247301-update-gcc-ada-gcc-interface-Make-.patch
+        108-gcc-8.0.0-Rename-delete-part-of-SVN247301.patch
         109-gcc-8.0.0-Part-of-SVN247301.patch
         111-gcc-8.0.0-Fix-gcc-ada-raise-gcc_c.patch)
 sha256sums=('SKIP'
@@ -102,8 +102,8 @@ sha256sums=('SKIP'
             'a1490c1553a1d6fb37b4a5451a1ece99af375e78723144663a91f3d706990e12'
             'faf9b6211f6053842fab68010bcc4980809c9a387ff07f72274107447ece6194'
             '3fb0f33ad4b3987ce56c289e8b85d367f85d5d234c59ba722f07f3ea5c037b32'
+            'becf3aa8dff91f7bc7df58bcbdd143e6a5f313d78c913388bfc74e339eb22171'
             'b3186d907a7c9e8847b3abba9b6fdf48d8ef19ec9a459ba46011e8f34a38956c'
-            '139601df056bc5f5b7c832c47107f945fd3282e4e44e6bc4ac8d1266a9a44a0b'
             '4484e00b49d8e3c7770c587248defc6e7421a672e42c3b3d4d11e79584aab353'
             'f2464e91d6a829f7a1bfc092b90a48e675dd7c58ac9f62bb6cedb618670fd667')
 
@@ -146,10 +146,10 @@ prepare() {
   ${GIT_AM} ${srcdir}/103-gcc-8_0_0-2017-04-27-Hristian-Kirtchev-kirtchev-adacore.com.patch
   ${GIT_AM} ${srcdir}/104-gcc-8_0_0-2017-04-27-Claire-Dross-dross-adacore.com.patch
   ${GIT_AM} ${srcdir}/105-gcc-8_0_0-2017-04-27-Gary-Dismukes-dismukes-adacore.com.patch
-
-  ${GIT_AM} ${srcdir}/107-gcc-8.0.0-Rename-delete-part-of-SVN247301.patch
-  ${GIT_AM} ${srcdir}/108-gcc-8.0.0-Part-of-SVN247301.patch
   ${GIT_AM} ${srcdir}/106-gcc-8_0_0-2017-04-27-Hristian-Kirtchev-kirtchev-adacore.com.patch
+  ${GIT_AM} ${srcdir}/107-Part-of-SVN247301-update-gcc-ada-gcc-interface-Make-.patch
+  #${GIT_AM} ${srcdir}/108-gcc-8.0.0-Rename-delete-part-of-SVN247301.patch
+
   #${GIT_AM} ${srcdir}/109-gcc-8.0.0-Part-of-SVN247301.patch
   #${GIT_AM} ${srcdir}/111-gcc-8.0.0-Fix-gcc-ada-raise-gcc_c.patch
 
