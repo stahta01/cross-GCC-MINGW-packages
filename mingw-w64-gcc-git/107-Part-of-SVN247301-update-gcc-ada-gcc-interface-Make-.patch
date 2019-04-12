@@ -48,16 +48,6 @@ index eb0489b4a..10c865f45 100644
   ada/s-mastop.o	\
   ada/s-memory.o	\
   ada/s-os_lib.o	\
-@@ -372,7 +379,9 @@ GNAT_ADA_OBJS =	\
-  ada/s-strhas.o	\
-  ada/s-string.o	\
-  ada/s-strops.o	\
-+ ada/s-traceb.o \
-  ada/s-traent.o	\
-+ ada/s-trasym.o \
-  ada/s-unstyp.o	\
-  ada/s-utf_32.o	\
-  ada/s-valint.o	\
 @@ -381,6 +390,7 @@ GNAT_ADA_OBJS =	\
   ada/s-wchcnv.o	\
   ada/s-wchcon.o	\
@@ -79,20 +69,6 @@ index eb0489b4a..10c865f45 100644
   ada/s-mastop.o   \
   ada/s-memory.o   \
   ada/s-os_lib.o   \
-@@ -555,11 +568,13 @@ GNATBIND_OBJS = \
-  ada/s-string.o   \
-  ada/s-strops.o   \
-  ada/s-traent.o   \
-+ ada/s-traceb.o   \
-  ada/s-unstyp.o   \
-  ada/s-utf_32.o   \
-  ada/s-wchcnv.o   \
-  ada/s-wchcon.o   \
-  ada/s-wchjis.o   \
-+ ada/s-wchstw.o   \
-  ada/scans.o      \
-  ada/scil_ll.o    \
-  ada/scng.o       \
 @@ -594,6 +609,21 @@ ADA_BACKEND = $(BACKEND) attribs.o
  # List of target dependent sources, overridden below as necessary
  TARGET_ADA_SRCS =
