@@ -13,7 +13,7 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}-git"
          "${MINGW_PACKAGE_PREFIX}-${_realname}-fortran-git"
          "${MINGW_PACKAGE_PREFIX}-${_realname}-ada-git"
          "${MINGW_PACKAGE_PREFIX}-${_realname}-objc-git")
-pkgver=8.0.0.d20170427.c16.g5bcff344383
+pkgver=8.0.0.d20170427.c17.g5bcff344383
 pkgrel=1
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
@@ -49,7 +49,9 @@ _commit=5bcff344383e1499e88044a713cac6a3eaaddb98 # SVN 247298   No build error
 #                   with patches 101-104, and 105               No build error
 #                   with patches 101-105, and 108               "System.Exceptions.Machine" is not a predefined library unit
 #                   with patches 101-105, and 109               gnat1drv.adb: undefined reference to `__gnat_personality_v0'
-#                   with patches 101-105, and 110               ??
+#                   with patches 101-105, and 110               fatal error: tconfig.h: No such file or directory
+#               with patches 101-105,110, and 111               fatal error: unwind-generic.h: No such file or directory
+#           with patches 101-105,110,111, and 112 with 107B     ??
 #               with patches 101-105,106, and 107               cannot generate code for file s-excmac.ads
 #           with patches 101-105,106,107, and 108               error: "s-traceb.adb" must be compiled
 #           with patches 101-105,106,107, and 112               cannot generate code for file s-excmac.ads
@@ -86,7 +88,8 @@ source=(${_realname}-git::"git://gcc.gnu.org/git/gcc.git#commit=${_commit}"
         104-gcc-8.0.0-Part-B-of-SVN247301.patch
         105-gcc-8.0.0-Part-C-of-SVN247301.patch
         106-gcc-8.0.0-Part-B-of-SVN247299.patch
-        107-gcc-8.0.0-Part-D-of-SVN247301-update-gcc-ada-gcc-interface-Mak.patch
+        107B-gcc-8.0.0-Part-D-of-SVN247301.patch
+        107C-gcc-8.0.0-Part-D-of-SVN247301.patch
         108-gcc-8.0.0-Part-E-of-SVN247301.patch
         109-gcc-8.0.0-Part-G-of-SVN247301-update-gcc-ada-system.ads.patch
         110-gcc-8.0.0-Part-H-of-SVN247301.patch
@@ -113,7 +116,8 @@ sha256sums=('SKIP'
             '315908d7f828f6cbbe610e6d42404819b901016e478bc911efd6be9fdfe9932e'
             '80fb59262be9eecf4dd57e19ba5e227b5b4f28a368ef6530b7e7acc58af5c1be'
             'f5c07b5e2cd3bb36af43dc57020a69cd7eb0bfa544ca72bd402dd836b3c2c639'
-            '183d544273eb5c466467782b899b6f075c9c1ad17ed30ff2b8e1915a285db223'
+            '644970d6a2e8b8bb4c3178a1ca6ae193ad8e328bdb6aa5918f0ceb739ded48f7'
+            'e34accaa5f24e0336d4819972445b3bbe22317ff5301ce8fb8bc25f2f9bb38b1'
             'ba1de218ff67228b26847d8a44cb6306da36a1dafd7065b310308d586742c83b'
             '8cb252b11bf344093f1035e00e086370198ee0df4684ea8730f12193f663c2a0'
             '0a63855793ca6d53e586ff57790f9dd294f3f9fa31067ecf494fb0d9f2806c6f'
@@ -161,13 +165,14 @@ prepare() {
   ${GIT_AM} ${srcdir}/105-gcc-8.0.0-Part-C-of-SVN247301.patch
 
   #${GIT_AM} ${srcdir}/106-gcc-8.0.0-Part-B-of-SVN247299.patch
-  #${GIT_AM} ${srcdir}/107-gcc-8.0.0-Part-D-of-SVN247301-update-gcc-ada-gcc-interface-Mak.patch
+  #${GIT_AM} ${srcdir}/107C-gcc-8.0.0-Part-D-of-SVN247301.patch
   #${GIT_AM} ${srcdir}/108-gcc-8.0.0-Part-E-of-SVN247301.patch
 
   #${GIT_AM} ${srcdir}/109-gcc-8.0.0-Part-G-of-SVN247301-update-gcc-ada-system.ads.patch
   ${GIT_AM} ${srcdir}/110-gcc-8.0.0-Part-H-of-SVN247301.patch
-  #${GIT_AM} ${srcdir}/111-gcc-8.0.0-part-of-SVN247309.patch
-  #${GIT_AM} ${srcdir}/112-gcc-8.0.0-Part-of-SVN247339.patch
+  ${GIT_AM} ${srcdir}/111-gcc-8.0.0-part-of-SVN247309.patch
+  ${GIT_AM} ${srcdir}/107B-gcc-8.0.0-Part-D-of-SVN247301.patch
+  ${GIT_AM} ${srcdir}/112-gcc-8.0.0-Part-of-SVN247339.patch
 
 
   # do not expect $prefix/mingw symlink - this should be superceded by
