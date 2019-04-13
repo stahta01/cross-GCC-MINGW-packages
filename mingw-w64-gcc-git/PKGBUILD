@@ -13,7 +13,7 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}-git"
          "${MINGW_PACKAGE_PREFIX}-${_realname}-fortran-git"
          "${MINGW_PACKAGE_PREFIX}-${_realname}-ada-git"
          "${MINGW_PACKAGE_PREFIX}-${_realname}-objc-git")
-pkgver=8.0.0.d20170427.c17.g5bcff344383
+pkgver=8.0.0.d20170427.c19.g5bcff344383
 pkgrel=1
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
@@ -52,9 +52,9 @@ _commit=5bcff344383e1499e88044a713cac6a3eaaddb98 # SVN 247298   No build error
 #                   with patches 101-105, and 110               fatal error: tconfig.h: No such file or directory
 #               with patches 101-105,110, and 111               fatal error: unwind-generic.h: No such file or directory
 #           with patches 101-105,110,111, and 112 with 107B     ??
-#               with patches 101-105,106, and 107               cannot generate code for file s-excmac.ads
-#           with patches 101-105,106,107, and 108               error: "s-traceb.adb" must be compiled
-#           with patches 101-105,106,107, and 112               cannot generate code for file s-excmac.ads
+#            with patches 101-105,106, and 107B/C               cannot generate code for file s-excmac.ads
+#        with patches 101-105,106,107B/C, and 108               error: "s-traceb.adb" must be compiled
+#        with patches 101-105,106,107B/C, and 112               cannot generate code for file s-excmac.ads
 #           with patches 101-105,106,107, and 109
 #           with patches 101-105,106,107, and 110
 #       with patches 101-105,106,107,108, and 109
