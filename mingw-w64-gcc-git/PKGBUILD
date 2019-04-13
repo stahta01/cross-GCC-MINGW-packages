@@ -13,7 +13,7 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}-git"
          "${MINGW_PACKAGE_PREFIX}-${_realname}-fortran-git"
          "${MINGW_PACKAGE_PREFIX}-${_realname}-ada-git"
          "${MINGW_PACKAGE_PREFIX}-${_realname}-objc-git")
-pkgver=8.0.0.d20170427.c18.g5bcff344383
+pkgver=8.0.0.d20170427.c16.g5bcff344383
 pkgrel=1
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
@@ -47,11 +47,12 @@ _commit=5bcff344383e1499e88044a713cac6a3eaaddb98 # SVN 247298   No build error
 #                                  with patch 101               No build error
 #                   with patches 101,102, and 103               No build error
 #                   with patches 101-104, and 105               No build error
-#                   with patches 101-105, and 109
+#                   with patches 101-105, and 108 add bits 110
+#                   with patches 101-105, and 109               ??
 #                   with patches 101-105, and 110
 #               with patches 101-105,106, and 107               cannot generate code for file s-excmac.ads
 #           with patches 101-105,106,107, and 108               error: "s-traceb.adb" must be compiled
-#           with patches 101-105,106,107, and 112               ??
+#           with patches 101-105,106,107, and 112               cannot generate code for file s-excmac.ads
 #           with patches 101-105,106,107, and 109
 #           with patches 101-105,106,107, and 110
 #       with patches 101-105,106,107,108, and 109
@@ -156,14 +157,15 @@ prepare() {
   ${GIT_AM} ${srcdir}/103-gcc-8.0.0-Part-A-of-SVN247301.patch
   ${GIT_AM} ${srcdir}/104-gcc-8.0.0-Part-B-of-SVN247301.patch
   ${GIT_AM} ${srcdir}/105-gcc-8.0.0-Part-C-of-SVN247301.patch
-  ${GIT_AM} ${srcdir}/106-gcc-8.0.0-Part-B-of-SVN247299.patch
-  ${GIT_AM} ${srcdir}/107-gcc-8.0.0-Part-D-of-SVN247301-update-gcc-ada-gcc-interface-Mak.patch
+
+  #${GIT_AM} ${srcdir}/106-gcc-8.0.0-Part-B-of-SVN247299.patch
+  #${GIT_AM} ${srcdir}/107-gcc-8.0.0-Part-D-of-SVN247301-update-gcc-ada-gcc-interface-Mak.patch
   #${GIT_AM} ${srcdir}/108-gcc-8.0.0-Part-E-of-SVN247301.patch
 
-  #${GIT_AM} ${srcdir}/109-gcc-8.0.0-Part-G-of-SVN247301-update-gcc-ada-system.ads.patch
+  ${GIT_AM} ${srcdir}/109-gcc-8.0.0-Part-G-of-SVN247301-update-gcc-ada-system.ads.patch
   #${GIT_AM} ${srcdir}/110-gcc-8.0.0-Part-H-of-SVN247301.patch
   #${GIT_AM} ${srcdir}/111-gcc-8.0.0-part-of-SVN247309.patch
-  ${GIT_AM} ${srcdir}/112-gcc-8.0.0-Part-of-SVN247339.patch
+  #${GIT_AM} ${srcdir}/112-gcc-8.0.0-Part-of-SVN247339.patch
 
 
   # do not expect $prefix/mingw symlink - this should be superceded by
