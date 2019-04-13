@@ -13,7 +13,7 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}-git"
          "${MINGW_PACKAGE_PREFIX}-${_realname}-fortran-git"
          "${MINGW_PACKAGE_PREFIX}-${_realname}-ada-git"
          "${MINGW_PACKAGE_PREFIX}-${_realname}-objc-git")
-pkgver=8.0.0.d20170427.c17.g5bcff344383
+pkgver=8.0.0.d20170427.c18.g5bcff344383
 pkgrel=1
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
@@ -47,8 +47,9 @@ _commit=5bcff344383e1499e88044a713cac6a3eaaddb98 # SVN 247298   No build error
 #                                  with patch 101               No build error
 #                   with patches 101,102, and 103               No build error
 #                   with patches 101-104, and 105               No build error
-#               with patches 101-105,106, and 107
-#           with patches 101-105,106,107, and 108
+#               with patches 101-105,106, and 107               cannot generate code for file s-excmac.ads
+#           with patches 101-105,106,107, and 112
+#           with patches 101-105,106,107, and 108               ??
 #       with patches 101-105,106,107,108, and 109
 #   with patches 101-105,106,107,108,109,110,111, and 112
 #_commit=375af1938058a2534ff52c5b8fd9f49e80232b00 # SVN 247299  cannot generate code for file s-excmac.ads
@@ -99,17 +100,18 @@ sha256sums=('SKIP'
             'b1c3c20bf501cebbcb02b4a50f117a4f90eb4fb79eac7aa99c85e2c54c106790'
             '33392651e17b81609718873ff32606deee5f3fc5176c197bb96eedc3dada8912'
             'bf83cbc79de4c86f02664c8a624e26b12f570e3c31116fc7c46ecf655696f9a6'
-            '37ca4334938e44f32d719cf9970b1e4d77036180369d995fbe0e656ef8df54f9'
-            'dc1bd5bb1d773038419fa28f2734fb87b32b1c681ff6306c7b5fb4e9188e7ca7'
-            '756a22cda08cdeb7e222cd369f960a2b3135500e7f284a7f1ea3f53416e7dc93'
-            'a1490c1553a1d6fb37b4a5451a1ece99af375e78723144663a91f3d706990e12'
-            'faf9b6211f6053842fab68010bcc4980809c9a387ff07f72274107447ece6194'
-            '3fb0f33ad4b3987ce56c289e8b85d367f85d5d234c59ba722f07f3ea5c037b32'
-            '4822fba068456868f51df6aacef36d3910b790b0f940ca1c1d2d113dc3dd5293'
-            'b3186d907a7c9e8847b3abba9b6fdf48d8ef19ec9a459ba46011e8f34a38956c'
-            'b2686de589099b9179465b9a547e0a8bb10605165e76f27482364527de5f5e7a'
-            'f2464e91d6a829f7a1bfc092b90a48e675dd7c58ac9f62bb6cedb618670fd667'
-            '')
+            '5a6dccb50bf01bdfa455e26067a81e3b3e8d4a84d75ff2ae8368a7b9c5abc17d'
+            '0e1a8717f224a2f6009dfc0df5b03398640fed5967f582bd8f374dde27d7db16'
+            'db189d459fd4812edf918659ef25630d9a05d17fe08c7a43af2d9577cdee7202'
+            '315908d7f828f6cbbe610e6d42404819b901016e478bc911efd6be9fdfe9932e'
+            '80fb59262be9eecf4dd57e19ba5e227b5b4f28a368ef6530b7e7acc58af5c1be'
+            'f5c07b5e2cd3bb36af43dc57020a69cd7eb0bfa544ca72bd402dd836b3c2c639'
+            '183d544273eb5c466467782b899b6f075c9c1ad17ed30ff2b8e1915a285db223'
+            'ba1de218ff67228b26847d8a44cb6306da36a1dafd7065b310308d586742c83b'
+            '8cb252b11bf344093f1035e00e086370198ee0df4684ea8730f12193f663c2a0'
+            '98a9ee6ed3899fcc508cb32a73b05224442fddfcf24d27d2a3a50ad4fb54670a'
+            'c08da75db9f1a169dbd5f2c4143471ad998a3fbd7b04ade97d29efba669d33ad'
+            'f1626341d4d9de3d5af42473995134096074f0619c85cd587f4160233d0ed0fa')
 
 _threads="posix"
 
@@ -152,9 +154,10 @@ prepare() {
   ${GIT_AM} ${srcdir}/105-gcc-8.0.0-Part-C-of-SVN247301.patch
   ${GIT_AM} ${srcdir}/106-gcc-8.0.0-Part-B-of-SVN247299.patch
   ${GIT_AM} ${srcdir}/107-gcc-8.0.0-Part-D-of-SVN247301-update-gcc-ada-gcc-interface-Mak.patch
-  #${GIT_AM} ${srcdir}/108-gcc-8.0.0-Part-E-of-SVN247301.patch
+  ${GIT_AM} ${srcdir}/108-gcc-8.0.0-Part-E-of-SVN247301.patch
 
   #${GIT_AM} ${srcdir}/109-gcc-8.0.0-Part-G-of-SVN247301-update-gcc-ada-system.ads.patch
+  #${GIT_AM} ${srcdir}/110-gcc-8.0.0-Part-H-of-SVN247301.patch
   #${GIT_AM} ${srcdir}/111-gcc-8.0.0-part-of-SVN247309.patch
   #${GIT_AM} ${srcdir}/112-gcc-8.0.0-Part-of-SVN247339.patch
 
