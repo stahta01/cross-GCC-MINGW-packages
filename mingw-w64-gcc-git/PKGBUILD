@@ -54,8 +54,9 @@ _commit=5bcff344383e1499e88044a713cac6a3eaaddb98 # SVN 247298   No build error
 #_commit=4af1de5b4b45c597d63e935dc3fae6d94b27d39e # SVN 247301  Fails with patch 111 and 112
 # Using SJLJ and 32 bit builds
 #                   with patches 101,102, and 103               ??
+#               with patches 101-103,106, and 107               ?cannot generate code for file s-excmac.ads
 #                        with patches 106 and 107
-#_commit=4af1de5b4b45c597d63e935dc3fae6d94b27d39e # SVN 247301
+#_commit=4af1de5b4b45c597d63e935dc3fae6d94b27d39e # SVN 247301  ?with patch 111 and 112
 # Fails means commit has xgcc internal error when building g-exptty.adb
 # 109 requires 110 to build very far
 # 106 requires 107 to build very far
