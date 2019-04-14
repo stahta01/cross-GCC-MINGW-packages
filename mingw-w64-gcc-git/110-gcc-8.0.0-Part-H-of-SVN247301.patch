@@ -1,4 +1,4 @@
-From 1ee1ca807239bed4acb43158c273ffe1317a498f Mon Sep 17 00:00:00 2001
+From abebbf9aec36979b4f282bdb58d15fe26d7f77f1 Mon Sep 17 00:00:00 2001
 From: Tim S <tim.stahlhut@gmail.com>
 Date: Fri, 12 Apr 2019 10:06:57 -0400
 Subject: Part H of SVN247301
@@ -32,16 +32,25 @@ Subject: Part H of SVN247301
 	* a-except.o: Adjust preequisites.
 	Add handling of s-excmac-arm.adb and s-excmac-gcc.adb.
 ---
- gcc/ada/gcc-interface/Make-lang.in |  2 +
+ gcc/ada/gcc-interface/Make-lang.in | 19 +++++++
  gcc/ada/raise-gcc.c                | 29 +++++++----
  gcc/ada/raise.c                    | 81 ++++++++++++++++++++++++------
- 3 files changed, 87 insertions(+), 25 deletions(-)
+ 3 files changed, 104 insertions(+), 25 deletions(-)
 
 diff --git a/gcc/ada/gcc-interface/Make-lang.in b/gcc/ada/gcc-interface/Make-lang.in
-index eb0489b4a50..4a08bad25d2 100644
+index eb0489b4a50..dc95c4e44be 100644
 --- a/gcc/ada/gcc-interface/Make-lang.in
 +++ b/gcc/ada/gcc-interface/Make-lang.in
-@@ -223,6 +223,7 @@ GCC_LLINK=$(LLINKER) $(GCC_LINKERFLAGS) $(LDFLAGS)
+@@ -99,6 +99,8 @@ ADA_TOOLS=gnatbind gnatchop gnat gnatkr gnatlink gnatls gnatmake \
+ ada-warn = $(ADA_CFLAGS) $(filter-out -pedantic, $(STRICT_WARN))
+ # Unresolved warnings in specific files.
+ ada/adaint.o-warn = -Wno-error
++# For unwind-pe.h
++CFLAGS-ada/raise-gcc.o += -I$(srcdir)/../libgcc -Iinclude
+ 
+ ada/%.o: ada/gcc-interface/%.c
+ 	$(COMPILE) $<
+@@ -223,6 +225,7 @@ GCC_LLINK=$(LLINKER) $(GCC_LINKERFLAGS) $(LDFLAGS)
  # Object files for gnat1 from C sources.
  GNAT1_C_OBJS = ada/adadecode.o ada/adaint.o ada/argv.o ada/cio.o \
   ada/cstreams.o ada/env.o ada/init.o ada/initialize.o ada/raise.o \
@@ -49,7 +58,7 @@ index eb0489b4a50..4a08bad25d2 100644
   ada/seh_init.o ada/targext.o ada/cuintp.o ada/decl.o ada/rtfinal.o \
   ada/rtinit.o ada/misc.o ada/utils.o ada/utils2.o ada/trans.o ada/targtyps.o
  
-@@ -514,6 +515,7 @@ GNATBIND_OBJS = \
+@@ -514,6 +517,7 @@ GNATBIND_OBJS = \
   ada/osint.o      \
   ada/output.o     \
   ada/raise.o      \
@@ -57,6 +66,28 @@ index eb0489b4a50..4a08bad25d2 100644
   ada/restrict.o   \
   ada/rident.o     \
   ada/rtfinal.o    \
+@@ -594,6 +598,21 @@ ADA_BACKEND = $(BACKEND) attribs.o
+ # List of target dependent sources, overridden below as necessary
+ TARGET_ADA_SRCS =
+ 
++# Select the right s-excmac according to exception layout (Itanium or arm)
++host_cpu=$(word 1, $(subst -, ,$(host)))
++EH_MECHANISM=-gcc
++ifeq ($(strip $(filter-out arm%,$(host_cpu))),)
++EH_MECHANISM=-arm
++endif
++
++ada/s-excmac.o: ada/s-excmac.ads ada/s-excmac.adb
++
++ada/s-excmac.ads: $(srcdir)/ada/s-excmac$(EH_MECHANISM).ads
++	$(CP) $< $@
++
++ada/s-excmac.adb: $(srcdir)/ada/s-excmac$(EH_MECHANISM).adb
++	$(CP) $< $@
++
+ # Needs to be built with CC=gcc
+ # Since the RTL should be built with the latest compiler, remove the
+ #  stamp target in the parent directory whenever gnat1 is rebuilt
 diff --git a/gcc/ada/raise-gcc.c b/gcc/ada/raise-gcc.c
 index 0074ad53fbc..cb35842b061 100644
 --- a/gcc/ada/raise-gcc.c
