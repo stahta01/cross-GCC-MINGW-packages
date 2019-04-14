@@ -1,17 +1,18 @@
-From fec651a1209f6427a9b629ce625e9c79d5c31ecd Mon Sep 17 00:00:00 2001
+From 4f79cb4c5504d2617a1035074e391674d5129b23 Mon Sep 17 00:00:00 2001
 From: Tim S <tim.stahlhut@gmail.com>
 Date: Fri, 12 Apr 2019 10:06:57 -0400
 Subject: Part I of SVN247301
 
 ---
- gcc/ada/gcc-interface/Make-lang.in | 4 ++++
- 1 file changed, 4 insertions(+)
+ gcc/ada/gcc-interface/Make-lang.in |  4 ++++
+ gcc/ada/gcc-interface/Makefile.in  | 20 ++++----------------
+ 2 files changed, 8 insertions(+), 16 deletions(-)
 
 diff --git a/gcc/ada/gcc-interface/Make-lang.in b/gcc/ada/gcc-interface/Make-lang.in
-index fbb1cd054ff..ecfe8858271 100644
+index 309edfeccd8..fa04e80a52d 100644
 --- a/gcc/ada/gcc-interface/Make-lang.in
 +++ b/gcc/ada/gcc-interface/Make-lang.in
-@@ -373,7 +373,9 @@ GNAT_ADA_OBJS =	\
+@@ -377,7 +377,9 @@ GNAT_ADA_OBJS =	\
   ada/s-strhas.o	\
   ada/s-string.o	\
   ada/s-strops.o	\
@@ -21,7 +22,7 @@ index fbb1cd054ff..ecfe8858271 100644
   ada/s-unstyp.o	\
   ada/s-utf_32.o	\
   ada/s-valint.o	\
-@@ -557,11 +559,13 @@ GNATBIND_OBJS = \
+@@ -564,11 +566,13 @@ GNATBIND_OBJS = \
   ada/s-string.o   \
   ada/s-strops.o   \
   ada/s-traent.o   \
@@ -35,6 +36,45 @@ index fbb1cd054ff..ecfe8858271 100644
   ada/scans.o      \
   ada/scil_ll.o    \
   ada/scng.o       \
+diff --git a/gcc/ada/gcc-interface/Makefile.in b/gcc/ada/gcc-interface/Makefile.in
+index 14269e271e1..b65ec2c7506 100644
+--- a/gcc/ada/gcc-interface/Makefile.in
++++ b/gcc/ada/gcc-interface/Makefile.in
+@@ -2427,32 +2427,20 @@ endif
+ 
+ ifeq ($(EH_MECHANISM),-gcc)
+   LIBGNAT_TARGET_PAIRS += \
+-    a-exexpr.adb<a-exexpr-gcc.adb \
+-    s-excmac.ads<s-excmac-gcc.ads
++    s-excmac.ads<s-excmac-gcc.ads \
++    s-excmac.adb<s-excmac-gcc.adb
+   EXTRA_LIBGNAT_OBJS+=raise-gcc.o
+   EXTRA_GNATRTL_NONTASKING_OBJS+=g-cppexc.o s-excmac.o
+ endif
+ 
+ ifeq ($(EH_MECHANISM),-arm)
+   LIBGNAT_TARGET_PAIRS += \
+-    a-exexpr.adb<a-exexpr-gcc.adb \
+-    s-excmac.ads<s-excmac-arm.ads
++    s-excmac.ads<s-excmac-arm.ads \
++    s-excmac.adb<s-excmac-arm.adb
+   EXTRA_LIBGNAT_OBJS+=raise-gcc.o
+   EXTRA_GNATRTL_NONTASKING_OBJS+=g-cppexc.o s-excmac.o
+ endif
+ 
+-# Use the Ada 2005 version of Ada.Exceptions by default, unless specified
+-# explicitly already. The base files (a-except.ad?) are used only for building
+-# the compiler and other basic tools.
+-# These base versions lack Ada 2005 additions which would cause bootstrap
+-# problems if included in the compiler and other basic tools.
+-
+-ifeq ($(filter a-except%,$(LIBGNAT_TARGET_PAIRS)),)
+-  LIBGNAT_TARGET_PAIRS += \
+-    a-except.ads<a-except-2005.ads \
+-    a-except.adb<a-except-2005.adb
+-endif
+-
+ # Configuration of host tools
+ 
+ # Under linux, host tools need to be linked with -ldl
 -- 
-2.21.0.windows.1
-
