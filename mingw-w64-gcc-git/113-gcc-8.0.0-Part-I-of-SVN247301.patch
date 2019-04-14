@@ -1,0 +1,40 @@
+From fec651a1209f6427a9b629ce625e9c79d5c31ecd Mon Sep 17 00:00:00 2001
+From: Tim S <tim.stahlhut@gmail.com>
+Date: Fri, 12 Apr 2019 10:06:57 -0400
+Subject: Part I of SVN247301
+
+---
+ gcc/ada/gcc-interface/Make-lang.in | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/gcc/ada/gcc-interface/Make-lang.in b/gcc/ada/gcc-interface/Make-lang.in
+index fbb1cd054ff..ecfe8858271 100644
+--- a/gcc/ada/gcc-interface/Make-lang.in
++++ b/gcc/ada/gcc-interface/Make-lang.in
+@@ -373,7 +373,9 @@ GNAT_ADA_OBJS =	\
+  ada/s-strhas.o	\
+  ada/s-string.o	\
+  ada/s-strops.o	\
++ ada/s-traceb.o \
+  ada/s-traent.o	\
++ ada/s-trasym.o \
+  ada/s-unstyp.o	\
+  ada/s-utf_32.o	\
+  ada/s-valint.o	\
+@@ -557,11 +559,13 @@ GNATBIND_OBJS = \
+  ada/s-string.o   \
+  ada/s-strops.o   \
+  ada/s-traent.o   \
++ ada/s-traceb.o   \
+  ada/s-unstyp.o   \
+  ada/s-utf_32.o   \
+  ada/s-wchcnv.o   \
+  ada/s-wchcon.o   \
+  ada/s-wchjis.o   \
++ ada/s-wchstw.o   \
+  ada/scans.o      \
+  ada/scil_ll.o    \
+  ada/scng.o       \
+-- 
+2.21.0.windows.1
+
