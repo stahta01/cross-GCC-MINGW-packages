@@ -4937,47 +4937,6 @@ index b21300308c5..10c865f457d 100644
   ada/scans.o      \
   ada/scil_ll.o    \
   ada/scng.o       \
-diff --git a/gcc/ada/gcc-interface/Makefile.in b/gcc/ada/gcc-interface/Makefile.in
-index 14269e271e1..b65ec2c7506 100644
---- a/gcc/ada/gcc-interface/Makefile.in
-+++ b/gcc/ada/gcc-interface/Makefile.in
-@@ -2427,32 +2427,20 @@ endif
- 
- ifeq ($(EH_MECHANISM),-gcc)
-   LIBGNAT_TARGET_PAIRS += \
--    a-exexpr.adb<a-exexpr-gcc.adb \
--    s-excmac.ads<s-excmac-gcc.ads
-+    s-excmac.ads<s-excmac-gcc.ads \
-+    s-excmac.adb<s-excmac-gcc.adb
-   EXTRA_LIBGNAT_OBJS+=raise-gcc.o
-   EXTRA_GNATRTL_NONTASKING_OBJS+=g-cppexc.o s-excmac.o
- endif
- 
- ifeq ($(EH_MECHANISM),-arm)
-   LIBGNAT_TARGET_PAIRS += \
--    a-exexpr.adb<a-exexpr-gcc.adb \
--    s-excmac.ads<s-excmac-arm.ads
-+    s-excmac.ads<s-excmac-arm.ads \
-+    s-excmac.adb<s-excmac-arm.adb
-   EXTRA_LIBGNAT_OBJS+=raise-gcc.o
-   EXTRA_GNATRTL_NONTASKING_OBJS+=g-cppexc.o s-excmac.o
- endif
- 
--# Use the Ada 2005 version of Ada.Exceptions by default, unless specified
--# explicitly already. The base files (a-except.ad?) are used only for building
--# the compiler and other basic tools.
--# These base versions lack Ada 2005 additions which would cause bootstrap
--# problems if included in the compiler and other basic tools.
--
--ifeq ($(filter a-except%,$(LIBGNAT_TARGET_PAIRS)),)
--  LIBGNAT_TARGET_PAIRS += \
--    a-except.ads<a-except-2005.ads \
--    a-except.adb<a-except-2005.adb
--endif
--
- # Configuration of host tools
- 
- # Under linux, host tools need to be linked with -ldl
 diff --git a/gcc/ada/raise-gcc.c b/gcc/ada/raise-gcc.c
 index 0074ad53fbc..cb35842b061 100644
 --- a/gcc/ada/raise-gcc.c
