@@ -13,7 +13,7 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}-git"
          "${MINGW_PACKAGE_PREFIX}-${_realname}-fortran-git"
          "${MINGW_PACKAGE_PREFIX}-${_realname}-ada-git"
          "${MINGW_PACKAGE_PREFIX}-${_realname}-objc-git")
-pkgver=8.0.0.d20170427.c19.g5bcff344383
+pkgver=8.0.0.d20170427.c21.g5bcff344383
 pkgrel=1
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
@@ -60,6 +60,7 @@ _commit=5bcff344383e1499e88044a713cac6a3eaaddb98 # SVN 247298   No build error
 # Fails means commit has xgcc internal error when building g-exptty.adb
 # 108 must be after 106
 # 109 must be after 110
+# 110 must be after 108
 
 # git+https://gcc.gnu.org/git/gcc.git#branch=${_branch}
 #source=(${_realname}-git::"git://gcc.gnu.org/git/gcc.git#branch=${_branch}"
