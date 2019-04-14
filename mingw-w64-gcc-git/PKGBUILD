@@ -53,7 +53,7 @@ _commit=5bcff344383e1499e88044a713cac6a3eaaddb98 # SVN 247298   No build error
 #           with patches 101-103,110,111, and 112 with 107B     undefined reference to `__gnat_all_others_value'
 #            with patches 101-103,106, and 107B/C               cannot generate code for file s-excmac.ads
 #        with patches 101-103,106,107B/C, and 108               error: "s-traceb.adb" must be compiled
-# with patches 101-103,106,107C,108,110,111,112, and 113        ??
+# with patches 101-103,106,107,108,110,111,112, and 113         ??
 #_commit=375af1938058a2534ff52c5b8fd9f49e80232b00 # SVN 247299  cannot generate code for file s-excmac.ads
 #_commit=4af1de5b4b45c597d63e935dc3fae6d94b27d39e # SVN 247301  Fails with patch 111 and 112
 # Fails means commit has xgcc internal error when building g-exptty.adb
@@ -82,7 +82,7 @@ source=(${_realname}-git::"git://gcc.gnu.org/git/gcc.git#commit=${_commit}"
         102-gcc-8.0.0-Part-A-of-SVN247299.patch
         103-gcc-8.0.0-Part-A-of-SVN247301.patch
         106-gcc-8.0.0-Part-B-of-SVN247299.patch
-        107C-gcc-8.0.0-Part-D-of-SVN247301.patch
+        107-gcc-8.0.0-Part-B-of-SVN247301.patch
         108-gcc-8.0.0-Part-E-of-SVN247301.patch
         109-gcc-8.0.0-Part-G-of-SVN247301-update-gcc-ada-system.ads.patch
         110-gcc-8.0.0-Part-H-of-SVN247301.patch
@@ -108,7 +108,7 @@ sha256sums=('SKIP'
             '0e1a8717f224a2f6009dfc0df5b03398640fed5967f582bd8f374dde27d7db16'
             '5b3fba329373639edfa93e9ad262641e8af24f4d82fac91bde07096c5df7e820'
             'f5c07b5e2cd3bb36af43dc57020a69cd7eb0bfa544ca72bd402dd836b3c2c639'
-            'e34accaa5f24e0336d4819972445b3bbe22317ff5301ce8fb8bc25f2f9bb38b1'
+            '0170b5e5d7664593cd83f532f51d9e275f8d549ad5894bcc5d603c34d2aa637f'
             'ba1de218ff67228b26847d8a44cb6306da36a1dafd7065b310308d586742c83b'
             '8cb252b11bf344093f1035e00e086370198ee0df4684ea8730f12193f663c2a0'
             'c145a7ca5c7fde6c27693ef89cde3f22cd255ccd97efdf94400b891d5b1f0df9'
@@ -155,7 +155,7 @@ prepare() {
   ${GIT_AM} ${srcdir}/103-gcc-8.0.0-Part-A-of-SVN247301.patch
 
   ${GIT_AM} ${srcdir}/106-gcc-8.0.0-Part-B-of-SVN247299.patch
-  ${GIT_AM} ${srcdir}/107C-gcc-8.0.0-Part-D-of-SVN247301.patch
+  ${GIT_AM} ${srcdir}/107-gcc-8.0.0-Part-B-of-SVN247301.patch
   ${GIT_AM} ${srcdir}/108-gcc-8.0.0-Part-E-of-SVN247301.patch
 
   ${GIT_AM} ${srcdir}/110-gcc-8.0.0-Part-H-of-SVN247301.patch
