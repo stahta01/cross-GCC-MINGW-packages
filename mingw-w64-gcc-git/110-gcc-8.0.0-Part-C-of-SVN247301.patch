@@ -4937,28 +4937,6 @@ index b21300308c5..10c865f457d 100644
   ada/scans.o      \
   ada/scil_ll.o    \
   ada/scng.o       \
-@@ -601,6 +609,21 @@ ADA_BACKEND = $(BACKEND) attribs.o
- # List of target dependent sources, overridden below as necessary
- TARGET_ADA_SRCS =
- 
-+# Select the right s-excmac according to exception layout (Itanium or arm)
-+host_cpu=$(word 1, $(subst -, ,$(host)))
-+EH_MECHANISM=-gcc
-+ifeq ($(strip $(filter-out arm%,$(host_cpu))),)
-+EH_MECHANISM=-arm
-+endif
-+
-+ada/s-excmac.o: ada/s-excmac.ads ada/s-excmac.adb
-+
-+ada/s-excmac.ads: $(srcdir)/ada/s-excmac$(EH_MECHANISM).ads
-+	$(CP) $< $@
-+
-+ada/s-excmac.adb: $(srcdir)/ada/s-excmac$(EH_MECHANISM).adb
-+	$(CP) $< $@
-+
- # Needs to be built with CC=gcc
- # Since the RTL should be built with the latest compiler, remove the
- #  stamp target in the parent directory whenever gnat1 is rebuilt
 diff --git a/gcc/ada/gcc-interface/Makefile.in b/gcc/ada/gcc-interface/Makefile.in
 index 14269e271e1..b65ec2c7506 100644
 --- a/gcc/ada/gcc-interface/Makefile.in

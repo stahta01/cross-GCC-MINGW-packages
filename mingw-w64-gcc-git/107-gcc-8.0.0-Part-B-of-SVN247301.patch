@@ -60,6 +60,28 @@ index eb0489b4a50..85e543c26b2 100644
   ada/s-mastop.o   \
   ada/s-memory.o   \
   ada/s-os_lib.o   \
+@@ -601,6 +609,21 @@ ADA_BACKEND = $(BACKEND) attribs.o
+ # List of target dependent sources, overridden below as necessary
+ TARGET_ADA_SRCS =
+ 
++# Select the right s-excmac according to exception layout (Itanium or arm)
++host_cpu=$(word 1, $(subst -, ,$(host)))
++EH_MECHANISM=-gcc
++ifeq ($(strip $(filter-out arm%,$(host_cpu))),)
++EH_MECHANISM=-arm
++endif
++
++ada/s-excmac.o: ada/s-excmac.ads ada/s-excmac.adb
++
++ada/s-excmac.ads: $(srcdir)/ada/s-excmac$(EH_MECHANISM).ads
++	$(CP) $< $@
++
++ada/s-excmac.adb: $(srcdir)/ada/s-excmac$(EH_MECHANISM).adb
++	$(CP) $< $@
++
+ # Needs to be built with CC=gcc
+ # Since the RTL should be built with the latest compiler, remove the
+ #  stamp target in the parent directory whenever gnat1 is rebuilt
 @@ -976,12 +1000,12 @@ ada/sdefault.o : ada/ada.ads ada/a-except.ads ada/a-unccon.ads \
  
  # Special flags - see gcc-interface/Makefile.in for the template.
