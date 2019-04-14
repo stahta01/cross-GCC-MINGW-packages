@@ -54,7 +54,7 @@ _commit=5bcff344383e1499e88044a713cac6a3eaaddb98 # SVN 247298   No build error
 #           with patches 101-105,110,111, and 112 with 107B     undefined reference to `__gnat_all_others_value'
 #            with patches 101-105,106, and 107B/C               cannot generate code for file s-excmac.ads
 #        with patches 101-105,106,107B/C, and 108               error: "s-traceb.adb" must be compiled
-# with patches 101-105,106,107C,108,110,111, and 112            ??
+# with patches 101-105,106,107C,108,110,111,112, and 113        ??
 #_commit=375af1938058a2534ff52c5b8fd9f49e80232b00 # SVN 247299  cannot generate code for file s-excmac.ads
 #_commit=4af1de5b4b45c597d63e935dc3fae6d94b27d39e # SVN 247301  Fails with patch 111 and 112
 # Fails means commit has xgcc internal error when building g-exptty.adb
@@ -82,15 +82,14 @@ source=(${_realname}-git::"git://gcc.gnu.org/git/gcc.git#commit=${_commit}"
         101-gcc-8.0.0-PR-demangler-80513-Part-of-SVN247300.patch
         102-gcc-8.0.0-Part-A-of-SVN247299.patch
         103-gcc-8.0.0-Part-A-of-SVN247301.patch
-        104-gcc-8.0.0-Part-B-of-SVN247301.patch
-        105-gcc-8.0.0-Part-C-of-SVN247301.patch
         106-gcc-8.0.0-Part-B-of-SVN247299.patch
         107C-gcc-8.0.0-Part-D-of-SVN247301.patch
         108-gcc-8.0.0-Part-E-of-SVN247301.patch
         109-gcc-8.0.0-Part-G-of-SVN247301-update-gcc-ada-system.ads.patch
         110-gcc-8.0.0-Part-H-of-SVN247301.patch
         111-gcc-8.0.0-part-of-SVN247309.patch
-        112-gcc-8.0.0-Part-of-SVN247339.patch)
+        112-gcc-8.0.0-Part-of-SVN247339.patch
+        113-gcc-8.0.0-Part-I-of-SVN247301.patch)
 sha256sums=('SKIP'
             '83e9c6f76f728ae3e2f2eabb588b0d6cea7a3eda03cd5e77aed9d613143b7348'
             '6033acda690786397059536787a6577e1a9f2b39f8a66276821917066094f43c'
@@ -156,8 +155,6 @@ prepare() {
   ${GIT_AM} ${srcdir}/101-gcc-8.0.0-PR-demangler-80513-Part-of-SVN247300.patch
   ${GIT_AM} ${srcdir}/102-gcc-8.0.0-Part-A-of-SVN247299.patch
   ${GIT_AM} ${srcdir}/103-gcc-8.0.0-Part-A-of-SVN247301.patch
-  ${GIT_AM} ${srcdir}/104-gcc-8.0.0-Part-B-of-SVN247301.patch
-  ${GIT_AM} ${srcdir}/105-gcc-8.0.0-Part-C-of-SVN247301.patch
 
   ${GIT_AM} ${srcdir}/106-gcc-8.0.0-Part-B-of-SVN247299.patch
   ${GIT_AM} ${srcdir}/107C-gcc-8.0.0-Part-D-of-SVN247301.patch
@@ -167,6 +164,7 @@ prepare() {
   #${GIT_AM} ${srcdir}/109-gcc-8.0.0-Part-G-of-SVN247301-update-gcc-ada-system.ads.patch
   ${GIT_AM} ${srcdir}/111-gcc-8.0.0-part-of-SVN247309.patch
   ${GIT_AM} ${srcdir}/112-gcc-8.0.0-Part-of-SVN247339.patch
+  ${GIT_AM} ${srcdir}/113-gcc-8.0.0-Part-I-of-SVN247301.patch
 
 
   # do not expect $prefix/mingw symlink - this should be superceded by
