@@ -53,9 +53,9 @@ options=('staticlibs' '!emptydirs' '!strip' 'debug')
 #_commit=4af1de5b4b45c597d63e935dc3fae6d94b27d39e # SVN 247301  Fails with patch 111 and 112
 # Using SJLJ and 32 bit builds
 #                   with patches 101,102, and 103               No build error
-#               with patches 101-103,106, and 107               configure error
+#               with patches 101-103,106, and 107 configure error caused by GCC used to build
 #                        with patches 106 and 107
-_commit=4af1de5b4b45c597d63e935dc3fae6d94b27d39e # SVN 247301  ?? with patch 111 and 112
+_commit=4af1de5b4b45c597d63e935dc3fae6d94b27d39e # SVN 247301   ?? with patch 111 and 112
 # Fails means commit has xgcc internal error when building g-exptty.adb
 # 106 requires 107 to build very far
 # 110 requires 106, 111, and 112 to build very far
