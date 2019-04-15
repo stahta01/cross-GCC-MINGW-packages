@@ -13,7 +13,7 @@ pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}-git"
          "${MINGW_PACKAGE_PREFIX}-${_realname}-fortran-git"
          "${MINGW_PACKAGE_PREFIX}-${_realname}-ada-git"
          "${MINGW_PACKAGE_PREFIX}-${_realname}-objc-git")
-pkgver=8.0.0.d20170427.c15.g5bcff344383
+pkgver=8.3.1.d20190415.c11.g8937eeb1a08
 pkgrel=1
 pkgdesc="GCC for the MinGW-w64"
 arch=('any')
@@ -52,11 +52,12 @@ _branch=gcc-8-branch
 #_commit=375af1938058a2534ff52c5b8fd9f49e80232b00 # SVN 247299  cannot generate code for file s-excmac.ads
 #_commit=4af1de5b4b45c597d63e935dc3fae6d94b27d39e # SVN 247301  Fails with patch 111 and 112
 # Using SJLJ and 32 bit builds
+#_branch=gcc-8-branch                             # SVN 270371  ??
 #                   with patches 101,102, and 103               No build error
 #               with patches 101-103,106, and 107               undefined reference
 #                        with patches 106 and 107
-#_commit=4af1de5b4b45c597d63e935dc3fae6d94b27d39e # SVN 247301  Bootstrap failure with patch 111 and 112
-# Bootstrap comparison failure! gcc/ada/binde.o differs
+#_commit=4af1de5b4b45c597d63e935dc3fae6d94b27d39e # SVN 247301  BC failure with patch 111 and 112
+# BC failure means Bootstrap comparison failure! gcc/ada/binde.o differs
 # Fails means commit has xgcc internal error when building g-exptty.adb
 # 106 requires 107 to build very far
 # 110 requires 106, 111, and 112 to build very far
