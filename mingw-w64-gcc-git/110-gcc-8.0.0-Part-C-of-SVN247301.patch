@@ -1,4 +1,4 @@
-From 87544c850a11082a32e4f53a6996ccfadcacb289 Mon Sep 17 00:00:00 2001
+From 1392d4cf0ad2264e95829c17a4ff3913734c3299 Mon Sep 17 00:00:00 2001
 From: Tim S <tim.stahlhut@gmail.com>
 Date: Fri, 12 Apr 2019 00:41:40 -0400
 Subject: Part C of SVN247301
@@ -43,12 +43,11 @@ Delete/Rename files and update copyright date of
  gcc/ada/a-except.ads               |   97 +-
  gcc/ada/a-exexpr-gcc.adb           |  439 -------
  gcc/ada/a-exexpr.adb               |  410 ++++++-
- gcc/ada/gcc-interface/Make-lang.in |   23 +
- gcc/ada/gcc-interface/Makefile.in  |   20 +-
+ gcc/ada/gcc-interface/Make-lang.in |    8 +
  gcc/ada/raise-gcc.c                |   29 +-
  gcc/ada/raise.c                    |   81 +-
  gcc/ada/system.ads                 |    8 +-
- 11 files changed, 1140 insertions(+), 3134 deletions(-)
+ 10 files changed, 1121 insertions(+), 3118 deletions(-)
  delete mode 100644 gcc/ada/a-except-2005.adb
  delete mode 100644 gcc/ada/a-except-2005.ads
  delete mode 100644 gcc/ada/a-exexpr-gcc.adb
@@ -4885,7 +4884,7 @@ index e2fd7d70e1e..91fb5f5cd67 100644
  
  end Exception_Propagation;
 diff --git a/gcc/ada/gcc-interface/Make-lang.in b/gcc/ada/gcc-interface/Make-lang.in
-index b21300308c5..10c865f457d 100644
+index d056a039c87..10c865f457d 100644
 --- a/gcc/ada/gcc-interface/Make-lang.in
 +++ b/gcc/ada/gcc-interface/Make-lang.in
 @@ -99,6 +99,8 @@ ADA_TOOLS=gnatbind gnatchop gnat gnatkr gnatlink gnatls gnatmake \
