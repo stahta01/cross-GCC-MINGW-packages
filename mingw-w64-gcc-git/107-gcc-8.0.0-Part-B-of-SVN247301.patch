@@ -1,17 +1,18 @@
-From 3bab18b2a0a143f7932b3b6f132fdf04f4922ac0 Mon Sep 17 00:00:00 2001
+From 93d314969d4034e3e9b569525f0969f8d74528ce Mon Sep 17 00:00:00 2001
 From: Tim S <tim.stahlhut@gmail.com>
 Date: Fri, 12 Apr 2019 10:06:57 -0400
-Subject: Part B of SVN247301 update gcc/ada/gcc-interface/Make-lang.in
+Subject: Part B of SVN247301
 
 ---
- gcc/ada/gcc-interface/Make-lang.in | 28 ++++++++++++++++++++++++++--
- 1 file changed, 26 insertions(+), 2 deletions(-)
+ gcc/ada/gcc-interface/Make-lang.in | 26 ++++++++++++++++++++++++--
+ gcc/ada/gcc-interface/Makefile.in  | 20 ++++----------------
+ 2 files changed, 28 insertions(+), 18 deletions(-)
 
 diff --git a/gcc/ada/gcc-interface/Make-lang.in b/gcc/ada/gcc-interface/Make-lang.in
-index eb0489b4a50..85e543c26b2 100644
+index eb0489b4a50..d056a039c87 100644
 --- a/gcc/ada/gcc-interface/Make-lang.in
 +++ b/gcc/ada/gcc-interface/Make-lang.in
-@@ -232,6 +234,7 @@ GNAT_ADA_OBJS =	\
+@@ -232,6 +232,7 @@ GNAT_ADA_OBJS =	\
   ada/a-chlat1.o	\
   ada/a-elchha.o	\
   ada/a-except.o	\
@@ -19,7 +20,7 @@ index eb0489b4a50..85e543c26b2 100644
   ada/a-ioexce.o	\
   ada/ada.o	\
   ada/spark_xrefs.o	\
-@@ -334,6 +337,7 @@ GNAT_ADA_OBJS =	\
+@@ -334,6 +335,7 @@ GNAT_ADA_OBJS =	\
   ada/rident.o	\
   ada/rtsfind.o	\
   ada/s-addope.o	\
@@ -27,7 +28,7 @@ index eb0489b4a50..85e543c26b2 100644
   ada/s-assert.o	\
   ada/s-bitops.o	\
   ada/s-carun8.o	\
-@@ -351,9 +355,11 @@ GNAT_ADA_OBJS =	\
+@@ -351,9 +353,11 @@ GNAT_ADA_OBJS =	\
   ada/s-excdeb.o	\
   ada/s-except.o	\
   ada/s-exctab.o	\
@@ -39,7 +40,7 @@ index eb0489b4a50..85e543c26b2 100644
   ada/s-mastop.o	\
   ada/s-memory.o	\
   ada/s-os_lib.o	\
-@@ -381,6 +387,7 @@ GNAT_ADA_OBJS =	\
+@@ -381,6 +385,7 @@ GNAT_ADA_OBJS =	\
   ada/s-wchcnv.o	\
   ada/s-wchcon.o	\
   ada/s-wchjis.o	\
@@ -47,7 +48,7 @@ index eb0489b4a50..85e543c26b2 100644
   ada/scans.o	\
   ada/scil_ll.o	\
   ada/scn.o	\
-@@ -534,10 +541,12 @@ GNATBIND_OBJS = \
+@@ -534,10 +539,12 @@ GNATBIND_OBJS = \
   ada/s-crtl.o     \
   ada/s-excdeb.o   \
   ada/s-except.o   \
@@ -60,7 +61,7 @@ index eb0489b4a50..85e543c26b2 100644
   ada/s-mastop.o   \
   ada/s-memory.o   \
   ada/s-os_lib.o   \
-@@ -601,6 +609,21 @@ ADA_BACKEND = $(BACKEND) attribs.o
+@@ -594,6 +601,21 @@ ADA_BACKEND = $(BACKEND) attribs.o
  # List of target dependent sources, overridden below as necessary
  TARGET_ADA_SRCS =
  
@@ -82,7 +83,7 @@ index eb0489b4a50..85e543c26b2 100644
  # Needs to be built with CC=gcc
  # Since the RTL should be built with the latest compiler, remove the
  #  stamp target in the parent directory whenever gnat1 is rebuilt
-@@ -976,12 +1000,12 @@ ada/sdefault.o : ada/ada.ads ada/a-except.ads ada/a-unccon.ads \
+@@ -976,12 +998,12 @@ ada/sdefault.o : ada/ada.ads ada/a-except.ads ada/a-unccon.ads \
  
  # Special flags - see gcc-interface/Makefile.in for the template.
  
