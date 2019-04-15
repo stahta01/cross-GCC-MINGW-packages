@@ -40,10 +40,10 @@ options=('staticlibs' '!emptydirs' '!strip' 'debug')
 
 #_branch=gcc-6-branch
 #_branch=gcc-7-branch
-#_branch=gcc-8-branch
+_branch=gcc-8-branch
 #_branch=master
 
-_commit=5bcff344383e1499e88044a713cac6a3eaaddb98 # SVN 247298   No build error
+#_commit=5bcff344383e1499e88044a713cac6a3eaaddb98 # SVN 247298   No build error
 # Using DWARF2 and 32 bit builds
 #                                  with patch 101               No build error
 #                   with patches 101,102, and 103               No build error
@@ -53,7 +53,7 @@ _commit=5bcff344383e1499e88044a713cac6a3eaaddb98 # SVN 247298   No build error
 #_commit=4af1de5b4b45c597d63e935dc3fae6d94b27d39e # SVN 247301  Fails with patch 111 and 112
 # Using SJLJ and 32 bit builds
 #                   with patches 101,102, and 103               No build error
-#               with patches 101-103,106, and 107               ??
+#               with patches 101-103,106, and 107               undefined reference
 #                        with patches 106 and 107
 #_commit=4af1de5b4b45c597d63e935dc3fae6d94b27d39e # SVN 247301  Bootstrap failure with patch 111 and 112
 # Bootstrap comparison failure! gcc/ada/binde.o differs
@@ -62,8 +62,8 @@ _commit=5bcff344383e1499e88044a713cac6a3eaaddb98 # SVN 247298   No build error
 # 110 requires 106, 111, and 112 to build very far
 
 # git+https://gcc.gnu.org/git/gcc.git#branch=${_branch}
-#source=(${_realname}-git::"git://gcc.gnu.org/git/gcc.git#branch=${_branch}"
-source=(${_realname}-git::"git://gcc.gnu.org/git/gcc.git#commit=${_commit}"
+source=(${_realname}-git::"git://gcc.gnu.org/git/gcc.git#branch=${_branch}"
+#source=(${_realname}-git::"git://gcc.gnu.org/git/gcc.git#commit=${_commit}"
         "0002-Relocate-libintl.patch"
         "0003-Windows-Follow-Posix-dir-exists-semantics-more-close.patch"
         "0004-Windows-Use-not-in-progpath-and-leave-case-as-is.patch"
@@ -144,12 +144,12 @@ prepare() {
     ${GIT_AM} ${srcdir}/0019-gcc-8-branch-Backport-patches-for-std-filesystem-from-master.patch
   fi
 
-  ${GIT_AM} ${srcdir}/101-gcc-8.0.0-PR-demangler-80513-Part-of-SVN247300.patch
-  ${GIT_AM} ${srcdir}/102-gcc-8.0.0-Part-A-of-SVN247299.patch
-  ${GIT_AM} ${srcdir}/103-gcc-8.0.0-Part-A-of-SVN247301.patch
+  #${GIT_AM} ${srcdir}/101-gcc-8.0.0-PR-demangler-80513-Part-of-SVN247300.patch
+  #${GIT_AM} ${srcdir}/102-gcc-8.0.0-Part-A-of-SVN247299.patch
+  #${GIT_AM} ${srcdir}/103-gcc-8.0.0-Part-A-of-SVN247301.patch
 
-  ${GIT_AM} ${srcdir}/106-gcc-8.0.0-Part-B-of-SVN247299.patch
-  ${GIT_AM} ${srcdir}/107-gcc-8.0.0-Part-B-of-SVN247301.patch
+  #${GIT_AM} ${srcdir}/106-gcc-8.0.0-Part-B-of-SVN247299.patch
+  #${GIT_AM} ${srcdir}/107-gcc-8.0.0-Part-B-of-SVN247301.patch
 
   #${GIT_AM} ${srcdir}/110-gcc-8.0.0-Part-C-of-SVN247301.patch
   #${GIT_AM} ${srcdir}/111-gcc-8.0.0-part-of-SVN247309.patch
