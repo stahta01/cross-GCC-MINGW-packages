@@ -1,7 +1,7 @@
-From c941f9696b8624c48ae02f783b36959b1272f0b3 Mon Sep 17 00:00:00 2001
+From 2dd832ee7e52358fe724fb0c1fd9b847e88dc770 Mon Sep 17 00:00:00 2001
 From: Tim S <tim.stahlhut@gmail.com>
 Date: Tue, 9 Apr 2019 08:16:18 -0400
-Subject: part of SVN247309
+Subject: Part of SVN247309
 
 Fix gcc/ada/raise-gcc.c
 ---
