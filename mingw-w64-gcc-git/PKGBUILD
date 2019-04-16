@@ -45,7 +45,7 @@ _branch=gcc-8-branch
 
 #_commit=5bcff344383e1499e88044a713cac6a3eaaddb98 # SVN 247298   No build error
 # Using DWARF2 and 32 bit builds
-#_branch=gcc-8-branch                             # SVN 270371
+#_branch=gcc-8-branch                             # SVN 270371  Fails
 #                                  with patch 101               No build error
 #                   with patches 101,102, and 103               No build error
 #               with patches 101-103,106, and 107               ?cannot generate code for file s-excmac.ads
